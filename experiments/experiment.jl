@@ -1,6 +1,6 @@
 include("iccad.jl")
 
-sys_rc = let 
+sys_rc = let
 	r_1 = 100000
 	r_2 = 500000
 	r_3 = 200000
