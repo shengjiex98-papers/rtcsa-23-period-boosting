@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.9
+# v0.19.11
 
 using Markdown
 using InteractiveUtils
@@ -22,40 +22,22 @@ begin
 end
 
 # ╔═╡ 981a2d06-32a8-4fe8-8b10-c9525f72ddf3
-@bind threshold_1_2 Slider(1:0.01:2, default=1.8, show_value=true)
-
-# ╔═╡ 4e207296-a683-4f9c-863b-3205fdda2fbd
-@bind threshold_0_01 Slider(0:0.001:0.1, default=0.05, show_value=true)
-
-# ╔═╡ 9a5471c8-1d00-48ff-a74f-67448835a50c
-@bind threshold Slider(0:0.1:15, default=10, show_value=true)
-
-# ╔═╡ b9e019af-d155-4f1c-9de3-712f1fd02011
-@bind threshold_ES Slider(0:0.0001:0.3, default=0.05, show_value=true)
-
-# ╔═╡ d5d11eb5-8f05-4190-aacb-dca923fa894c
-@bind threshold_F1 Slider(0:0.01:10, default=1, show_value=true)
-
-# ╔═╡ 203ebc89-e958-441f-8788-75d1bc945a3f
-@bind threshold_500 Slider(0:500, default=20, show_value=true)
-
-# ╔═╡ db475d07-ed0e-478c-8fb3-5975719266ab
-@bind threshold_AP Slider(0:0.1:5, default=4, show_value=true)
+@bind perc Slider(0:0.01:1, show_value=true)
 
 # ╔═╡ a9578595-f100-44dc-89b0-a8926c979acb
-function summer(path, threshold; sigdigits=2)
+function summer(path, threshold_percent; sigdigits=2)
 	d = readdlm(path, ',', Float64)
 	d = round.(d; sigdigits=sigdigits)
 	w = size(d, 2)
 	deviations = d[1:w,:]
 	indices    = d[w+1:2w,:]
 	
-	# min_v = minimum(x -> isnan(x) ? Inf  : x, deviations)
-	# max_v = maximum(x -> isnan(x) ? -Inf : x, deviations)
-	# slider = Slider(0:1000, default=100, show_value=true)
-	# @bind threshold slider
+	min_v = minimum(x -> isnan(x) ? Inf  : x, deviations)
+	max_v = maximum(x -> isnan(x) ? -Inf : x, deviations)
+	threshold = min_v + (max_v - min_v) * threshold_percent
 
 	to_show = fill(NaN, size(deviations))
+
 	
 	min_hits = 1
 	for window_size in 2:w+1
@@ -73,58 +55,19 @@ function summer(path, threshold; sigdigits=2)
 end
 
 # ╔═╡ c4ab5843-067c-44a6-aec9-7f0290f4853a
-summer("data/parallel/RC_HoldAndKill.csv", threshold_1_2, sigdigits=3)
+summer("data/default/0.02s_0.02s/DCM_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
 
-# ╔═╡ 9665c251-7374-436f-b1fd-c8b5cdef8270
-summer("data/period_0.02/RC_HoldAndKill.csv", threshold_0_01, sigdigits=3)
+# ╔═╡ 485404b8-ad5c-4e52-9806-dbc2b6623cef
+summer("data/default/0.02s_0.02s/CSS_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
 
-# ╔═╡ 37332697-7b8a-4f6c-a56b-6c29c9ea273c
-summer("data/short/ES_HoldAndKill.csv", threshold, sigdigits=2)
+# ╔═╡ a919cccd-eac3-4894-b33c-bd32b869a4f4
+summer("data/default/0.02s_0.02s/EWB_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
 
-# ╔═╡ 3fbd754c-7ce1-4d2c-83c0-e54fc451ed0e
-summer("data/parallel/F1_HoldAndKill.csv", threshold, sigdigits=2)
+# ╔═╡ 992a17e8-4cc5-4cdb-8ac2-8489d16ad205
+summer("data/default/0.02s_0.02s/CC1_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
 
-# ╔═╡ 4fd31c79-c8fe-4d3e-b5a8-e111ae748277
-summer("data/period_0.02/ES_HoldAndKill.csv", threshold_ES, sigdigits=3)
-
-# ╔═╡ 13ec75c8-874e-4f08-8b8a-416d9f46613c
-summer("data/period_0.02/F1_HoldAndKill.csv", threshold_F1, sigdigits=3)
-
-# ╔═╡ 067d97f9-2599-4b64-8791-2d5d9fc49a07
-summer("data/short/AP_HoldAndKill.csv", threshold_500)
-
-# ╔═╡ f4c0af9a-57bb-4cdc-9f8d-ba6113e59f72
-summer("data/period_0.02/AP_HoldAndKill.csv", threshold_AP)
-
-# ╔═╡ 09ef9182-5350-4347-82e8-fc4cf13c3976
-@bind t_dcm Slider(0:0.01:0.5, show_value=true)
-
-# ╔═╡ 596ae945-2d62-4b2a-8349-6c5f416d1dda
-summer("data/default/DCM_HoldAndKill_n5_t100.csv", t_dcm)
-
-# ╔═╡ f1b3a897-70d5-4c68-98f7-6727e72fa442
-@bind t_css Slider(0:0.01:12, show_value=true)
-
-# ╔═╡ d8029862-0259-4982-94e8-496b4239063e
-summer("data/default/CSS_HoldAndKill_n5_t100.csv", t_css)
-
-# ╔═╡ ceb12397-a119-485a-a7e3-fdabfa4ae2f3
-@bind t_ewb Slider(0:0.01:12, show_value=true)
-
-# ╔═╡ 379c5629-e8df-4188-9716-b0f0db996119
-summer("data/default/EWB_HoldAndKill_n5_t100.csv", t_ewb)
-
-# ╔═╡ 692cea24-bf1a-4275-b388-8f2fc7ea610e
-@bind t_cc1 Slider(0:0.01:12, show_value=true)
-
-# ╔═╡ aba4fefb-f8db-4d37-a287-aa0e6352b4ff
-summer("data/default/CC1_HoldAndKill_n5_t100.csv", t_cc1)
-
-# ╔═╡ edfe4eb1-a007-47d3-a195-704479587365
-@bind t_cc2 Slider(0:0.01:3, show_value=true)
-
-# ╔═╡ 93d654ad-357e-4b33-ac6a-40a941219854
-summer("data/default/CC2_HoldAndKill_n5_t100.csv", t_cc2, sigdigits=4)
+# ╔═╡ 3c96a791-8722-4a3f-b071-6231cfb95aa9
+summer("data/default/0.02s_0.02s/CC2_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -142,8 +85,9 @@ PlutoUI = "~0.7.38"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.7.3"
+julia_version = "1.8.0"
 manifest_format = "2.0"
+project_hash = "f846d95ad83bc5fd8c829129597cf49d0a6aefa7"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -153,6 +97,7 @@ version = "1.1.4"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
+version = "1.1.1"
 
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
@@ -187,6 +132,7 @@ version = "3.43.0"
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
+version = "0.5.2+0"
 
 [[deps.Dates]]
 deps = ["Printf"]
@@ -203,6 +149,7 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 [[deps.Downloads]]
 deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
+version = "1.6.0"
 
 [[deps.FileIO]]
 deps = ["Pkg", "Requires", "UUIDs"]
@@ -280,10 +227,12 @@ version = "0.21.3"
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
 uuid = "b27032c2-a3e7-50c8-80cd-2d36dbcbfd21"
+version = "0.6.3"
 
 [[deps.LibCURL_jll]]
 deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll", "Zlib_jll", "nghttp2_jll"]
 uuid = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
+version = "7.84.0+0"
 
 [[deps.LibGit2]]
 deps = ["Base64", "NetworkOptions", "Printf", "SHA"]
@@ -292,6 +241,7 @@ uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
 [[deps.LibSSH2_jll]]
 deps = ["Artifacts", "Libdl", "MbedTLS_jll"]
 uuid = "29816b5a-b9ab-546f-933c-edad1886dfa8"
+version = "1.10.2+0"
 
 [[deps.Libdl]]
 uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
@@ -316,19 +266,23 @@ uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 [[deps.MbedTLS_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "c8ffd9c3-330d-5841-b78e-0817d7145fa1"
+version = "2.28.0+0"
 
 [[deps.Mmap]]
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 
 [[deps.MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
+version = "2022.2.1"
 
 [[deps.NetworkOptions]]
 uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
+version = "1.2.0"
 
 [[deps.OpenBLAS_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
 uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
+version = "0.3.20+0"
 
 [[deps.OpenSSL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -345,6 +299,7 @@ version = "2.3.1"
 [[deps.Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+version = "1.8.0"
 
 [[deps.PlutoUI]]
 deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "Markdown", "Random", "Reexport", "UUIDs"]
@@ -383,6 +338,7 @@ version = "1.3.0"
 
 [[deps.SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
+version = "0.7.0"
 
 [[deps.Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
@@ -405,10 +361,12 @@ uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 [[deps.TOML]]
 deps = ["Dates"]
 uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
+version = "1.0.0"
 
 [[deps.Tar]]
 deps = ["ArgTools", "SHA"]
 uuid = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
+version = "1.10.0"
 
 [[deps.Test]]
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
@@ -429,6 +387,7 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 [[deps.Zlib_jll]]
 deps = ["Libdl"]
 uuid = "83775a58-1f1d-513f-b197-d71354ab007a"
+version = "1.2.12+3"
 
 [[deps.Zstd_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -439,43 +398,27 @@ version = "1.5.2+0"
 [[deps.libblastrampoline_jll]]
 deps = ["Artifacts", "Libdl", "OpenBLAS_jll"]
 uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
+version = "5.1.1+0"
 
 [[deps.nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
+version = "1.48.0+0"
 
 [[deps.p7zip_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
+version = "17.4.0+0"
 """
 
 # ╔═╡ Cell order:
 # ╠═41a85aac-d357-11ec-3d01-71de103a66ec
 # ╠═981a2d06-32a8-4fe8-8b10-c9525f72ddf3
 # ╠═c4ab5843-067c-44a6-aec9-7f0290f4853a
-# ╠═4e207296-a683-4f9c-863b-3205fdda2fbd
-# ╠═9665c251-7374-436f-b1fd-c8b5cdef8270
-# ╠═9a5471c8-1d00-48ff-a74f-67448835a50c
-# ╠═37332697-7b8a-4f6c-a56b-6c29c9ea273c
-# ╠═3fbd754c-7ce1-4d2c-83c0-e54fc451ed0e
-# ╠═b9e019af-d155-4f1c-9de3-712f1fd02011
-# ╠═4fd31c79-c8fe-4d3e-b5a8-e111ae748277
-# ╠═d5d11eb5-8f05-4190-aacb-dca923fa894c
-# ╠═13ec75c8-874e-4f08-8b8a-416d9f46613c
-# ╠═203ebc89-e958-441f-8788-75d1bc945a3f
-# ╠═067d97f9-2599-4b64-8791-2d5d9fc49a07
-# ╠═db475d07-ed0e-478c-8fb3-5975719266ab
-# ╠═f4c0af9a-57bb-4cdc-9f8d-ba6113e59f72
-# ╠═a9578595-f100-44dc-89b0-a8926c979acb
-# ╠═09ef9182-5350-4347-82e8-fc4cf13c3976
-# ╠═596ae945-2d62-4b2a-8349-6c5f416d1dda
-# ╠═f1b3a897-70d5-4c68-98f7-6727e72fa442
-# ╠═d8029862-0259-4982-94e8-496b4239063e
-# ╠═ceb12397-a119-485a-a7e3-fdabfa4ae2f3
-# ╠═379c5629-e8df-4188-9716-b0f0db996119
-# ╠═692cea24-bf1a-4275-b388-8f2fc7ea610e
-# ╠═aba4fefb-f8db-4d37-a287-aa0e6352b4ff
-# ╠═edfe4eb1-a007-47d3-a195-704479587365
-# ╠═93d654ad-357e-4b33-ac6a-40a941219854
+# ╠═485404b8-ad5c-4e52-9806-dbc2b6623cef
+# ╠═a919cccd-eac3-4894-b33c-bd32b869a4f4
+# ╠═992a17e8-4cc5-4cdb-8ac2-8489d16ad205
+# ╠═3c96a791-8722-4a3f-b071-6231cfb95aa9
+# ╟─a9578595-f100-44dc-89b0-a8926c979acb
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

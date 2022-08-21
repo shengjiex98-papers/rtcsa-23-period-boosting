@@ -102,6 +102,11 @@ sys_names = sort([keys(sys_map)...])
 
 function create_job(sys_name, x0, periods...; dir="data/default", clr=false)
     @info "Threads: " Threads.nthreads()
+
+    if !isdir(dir)
+        mkdir(dir)
+    end
+
     system = sys_map[sys_name]
 
     n = 5
@@ -113,17 +118,22 @@ function create_job(sys_name, x0, periods...; dir="data/default", clr=false)
     bounds = repeat([x0 x0], q)
 
     for hs in periods
+        subdir = "$(rstrip(dir, '/'))/$(hs[1])s_$(hs[2])s"
+        if !isdir(dir)
+            mkdir(subdir)
+        end
+
         strat = HoldAndKill
         model = (c2d(system, hs[1]), delay_lqr(system, hs[2]))
         
-        synthesize_full(safety_margin, bounds, model, sys_name, strat, n, max_window_size, t; dims=[2], dir=dir, clr=clr)
+        synthesize_full(safety_margin, bounds, model, sys_name, strat, n, max_window_size, t; dims=[2], dir=subdir, clr=clr)
     end
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__
     @info "Running as main"
     # create_job(ARGS[1], ARGS[2:end]...)
-    print(ARGS)
+    # print(ARGS)
 else
     @info "Included as module"
 end
