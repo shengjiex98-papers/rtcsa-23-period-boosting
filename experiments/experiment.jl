@@ -81,7 +81,7 @@ delay_lqr(sys, h) = let
     lqr(sysd_delay, Q, R)
 end
 
-# model_map = Dict(
+# sys_map = Dict(
 #     "RC" => (c2d(sys_rc, h), delay_lqr(sys_rc, h)),
 #     # "F1" => (sysd_f1, [0.293511 0.440267]),
 #     "DCM" => (c2d(sys_dcm, h), delay_lqr(sys_dcm, h)),
@@ -90,7 +90,7 @@ end
 #     "CC1" => (c2d(sys_cc1, h), delay_lqr(sys_cc1, h)),
 #     "CC2" => (c2d(sys_cc2, h), delay_lqr(sys_cc2, h))
 # )
-model_map = Dict(
+sys_map = Dict(
     "RC" => sys_rc,
     "DCM" => sys_dcm,
     "CSS" => sys_css,
@@ -98,23 +98,25 @@ model_map = Dict(
     "CC1" => sys_cc1,
     "CC2" => sys_cc2
 )
-model_names = sort([keys(model_map)...])
+sys_names = sort([keys(sys_map)...])
 
-function create_job(model_name, x0, h, strat_names...; dir="data/default", clr=false)
+function create_job(sys_name, x0, periods...; dir="data/default", clr=false)
     @info "Threads: " Threads.nthreads()
-    model = model_map[model_name]
+    system = sys_map[sys_name]
 
     n = 5
     t = 100
     max_window_size = 6
     safety_margin = 1000
 
-    q = size(model[1].A, 1)
+    q = size(system.A, 1)
     bounds = repeat([x0 x0], q)
 
-    for strat_name in strat_names
-        strat = strat_map[strat_name]
-        synthesize_full(safety_margin, bounds, model, model_name, strat, n, max_window_size, t; dims=[2], dir=dir, clr=clr)
+    for hs in periods
+        strat = HoldAndKill
+        model = (c2d(system, hs[1]), delay_lqr(system, hs[2]))
+        
+        synthesize_full(safety_margin, bounds, model, sys_name, strat, n, max_window_size, t; dims=[2], dir=dir, clr=clr)
     end
 end
 
