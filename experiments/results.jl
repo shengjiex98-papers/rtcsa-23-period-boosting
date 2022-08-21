@@ -21,8 +21,24 @@ begin
 	using PlutoUI
 end
 
+# ╔═╡ 66731c94-e83e-414c-80eb-b37d8ef69724
+md"""
+## 20 ms period w/ 20 ms discretization
+"""
+
 # ╔═╡ 981a2d06-32a8-4fe8-8b10-c9525f72ddf3
 @bind perc Slider(0:0.01:1, show_value=true)
+
+# ╔═╡ 0a47ccae-a40d-411b-bb26-3953581997af
+md"""
+## 5 ms period w/ 20 ms discretization
+"""
+
+# ╔═╡ b2b73a96-362b-48dd-b441-56188b0661a0
+@bind s520 Slider(0:0.01:1, show_value=true)
+
+# ╔═╡ ca8f8a4c-ad2b-40a2-8e39-481080d07e44
+
 
 # ╔═╡ a9578595-f100-44dc-89b0-a8926c979acb
 function summer(path, threshold_percent; sigdigits=2)
@@ -413,12 +429,16 @@ version = "17.4.0+0"
 
 # ╔═╡ Cell order:
 # ╠═41a85aac-d357-11ec-3d01-71de103a66ec
+# ╠═66731c94-e83e-414c-80eb-b37d8ef69724
 # ╠═981a2d06-32a8-4fe8-8b10-c9525f72ddf3
 # ╠═c4ab5843-067c-44a6-aec9-7f0290f4853a
 # ╠═485404b8-ad5c-4e52-9806-dbc2b6623cef
 # ╠═a919cccd-eac3-4894-b33c-bd32b869a4f4
 # ╠═992a17e8-4cc5-4cdb-8ac2-8489d16ad205
 # ╠═3c96a791-8722-4a3f-b071-6231cfb95aa9
+# ╠═0a47ccae-a40d-411b-bb26-3953581997af
+# ╠═b2b73a96-362b-48dd-b441-56188b0661a0
+# ╠═ca8f8a4c-ad2b-40a2-8e39-481080d07e44
 # ╟─a9578595-f100-44dc-89b0-a8926c979acb
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
