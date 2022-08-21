@@ -295,6 +295,14 @@ function ZeroAndSkipNext(sysd, K, miss=nothing, window=1)
 		T, μ, 1)
 end
 
+strat_map = Dict(
+    "HK" => HoldAndKill,
+    "ZK" => ZeroAndKill,
+    "HS" => HoldAndSkipNext,
+    "ZS" => ZeroAndSkipNext
+)
+strat_names = sort([keys(strat_map)...])
+
 function c2da(sysc::AbstractStateSpace{<:ControlSystems.Continuous}, Ts::Real, d::Real)
     f_Φ = s -> ℯ^(sysc.A * s)
     Φ = f_Φ(Ts)
@@ -449,11 +457,3 @@ function corners_from_bounds(bounds; cycle=false, dims=nothing)
 		corners
 	end
 end
-
-strat_map = Dict(
-    "HK" => HoldAndKill,
-    "ZK" => ZeroAndKill,
-    "HS" => HoldAndSkipNext,
-    "ZS" => ZeroAndSkipNext
-)
-strat_names = sort([keys(strat_map)...])
