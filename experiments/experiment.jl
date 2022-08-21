@@ -118,8 +118,9 @@ function create_job(sys_name, x0, periods...; dir="data/default", clr=false)
     bounds = repeat([x0 x0], q)
 
     for hs in periods
+        @info "Period is" hs[1] hs[2]
         subdir = "$(rstrip(dir, '/'))/$(hs[1])s_$(hs[2])s"
-        if !isdir(dir)
+        if !isdir(subdir)
             mkdir(subdir)
         end
 
