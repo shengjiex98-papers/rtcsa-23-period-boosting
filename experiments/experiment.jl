@@ -18,6 +18,7 @@ sys_rc = let
 	ss(A, B, C, D)
 end
 
+# This is discretized with period h=0.02s
 sysd_f1 = let
 	A = [1 0.13; 0 1];
 	B = [0.02559055118110236; 0.39370078740157477];
@@ -80,18 +81,26 @@ delay_lqr(sys, h) = let
     lqr(sysd_delay, Q, R)
 end
 
+# model_map = Dict(
+#     "RC" => (c2d(sys_rc, h), delay_lqr(sys_rc, h)),
+#     # "F1" => (sysd_f1, [0.293511 0.440267]),
+#     "DCM" => (c2d(sys_dcm, h), delay_lqr(sys_dcm, h)),
+#     "CSS" => (c2d(sys_css, h), delay_lqr(sys_css, h)),
+#     "EWB" => (c2d(sys_ewb, h), delay_lqr(sys_ewb, h)),
+#     "CC1" => (c2d(sys_cc1, h), delay_lqr(sys_cc1, h)),
+#     "CC2" => (c2d(sys_cc2, h), delay_lqr(sys_cc2, h))
+# )
 model_map = Dict(
-    "DCM" => (c2d(sys_dcm, h), delay_lqr(sys_dcm, h)),
-    "CSS" => (c2d(sys_css, h), delay_lqr(sys_css, h)),
-    "EWB" => (c2d(sys_ewb, h), delay_lqr(sys_ewb, h)),
-    "CC1" => (c2d(sys_cc1, h), delay_lqr(sys_cc1, h)),
-    "CC2" => (c2d(sys_cc2, h), delay_lqr(sys_cc2, h)),
-    "RC" => (c2d(sys_rc, h), delay_lqr(sys_rc, h)),
-    "F1" => (sysd_f1, [0.293511 0.440267])
+    "RC" => sys_rc,
+    "DCM" => sys_dcm,
+    "CSS" => sys_css,
+    "EWB" => sys_ewb,
+    "CC1" => sys_cc1,
+    "CC2" => sys_cc2
 )
 model_names = sort([keys(model_map)...])
 
-function create_job(model_name, s0, strat_names...; dir="data/default", clr=false)
+function create_job(model_name, x0, h, strat_names...; dir="data/default", clr=false)
     @info "Threads: " Threads.nthreads()
     model = model_map[model_name]
 
@@ -101,7 +110,7 @@ function create_job(model_name, s0, strat_names...; dir="data/default", clr=fals
     safety_margin = 1000
 
     q = size(model[1].A, 1)
-    bounds = repeat([s0 s0], q)
+    bounds = repeat([x0 x0], q)
 
     for strat_name in strat_names
         strat = strat_map[strat_name]
@@ -111,7 +120,8 @@ end
 
 if abspath(PROGRAM_FILE) == @__FILE__
     @info "Running as main"
-    create_job(ARGS[1], ARGS[2:end]...)
+    # create_job(ARGS[1], ARGS[2:end]...)
+    print(ARGS)
 else
     @info "Included as module"
 end
