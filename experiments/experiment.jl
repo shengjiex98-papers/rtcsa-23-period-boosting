@@ -94,7 +94,7 @@ sys_map = Dict(
     "RC" => sys_rc,
     "DCM" => sys_dcm,
     "CSS" => sys_css,
-    "EWB" => sys_ewb,
+    # "EWB" => sys_ewb,
     "CC1" => sys_cc1,
     "CC2" => sys_cc2
 )
