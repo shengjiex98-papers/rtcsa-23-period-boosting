@@ -1,14 +1,14 @@
 include("experiment.jl")
 
-periods = [0.005, 0.010, 0.020, 0.040, 0.080, 0.160, 0.320]
-path = "data/samedisc"
+periods = [0.020, 0.023, 0.025, 0.027, 0.018, 0.015]
+path = "data/closeperiod"
 
 # Recomputed gain values
-# for sys_name in sys_names, discretization in periods
-#     create_job(sys_name, 10, (discretization, discretization), dir=path)
-# end
+for sys_name in sys_names, period in periods
+    create_job(sys_name, 10, (period, period), dir=path, clr=false)
+end
 
 # Old gain values
 for sys_name in sys_names, period in periods
-    create_job(sys_name, 10, (period, 0.020), dir=path)
+    create_job(sys_name, 10, (period, 0.020), dir=path, clr=false)
 end
