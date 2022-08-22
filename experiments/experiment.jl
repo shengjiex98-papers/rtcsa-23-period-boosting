@@ -129,6 +129,8 @@ function create_job(sys_name, x0, periods...; dir="data/default", clr=false)
         
         synthesize_full(safety_margin, bounds, model, sys_name, strat, n, max_window_size, t; dims=[2], dir=subdir, clr=clr)
     end
+
+    @info "Experiment finished."
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__

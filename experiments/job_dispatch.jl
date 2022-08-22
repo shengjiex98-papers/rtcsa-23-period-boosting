@@ -5,10 +5,10 @@ path = "data/closeperiod"
 
 # Recomputed gain values
 for sys_name in sys_names, period in periods
-    create_job(sys_name, 10, (period, period), dir=path, clr=false)
+    create_job(sys_name, 10, (period, period), dir=path, clr=true)
 end
 
 # Old gain values
 for sys_name in sys_names, period in periods
-    create_job(sys_name, 10, (period, 0.020), dir=path, clr=false)
+    create_job(sys_name, 10, (period, 0.020), dir=path, clr=true)
 end
