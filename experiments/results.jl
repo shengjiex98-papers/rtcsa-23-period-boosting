@@ -35,11 +35,13 @@ md"""
 
 # ╔═╡ 0a47ccae-a40d-411b-bb26-3953581997af
 md"""
-## 5 ms period w/ 20 ms discretization
+## 23 ms period w/ 20 ms discretization
 """
 
-# ╔═╡ b2b73a96-362b-48dd-b441-56188b0661a0
-@bind s520 Slider(0:0.01:1, show_value=true)
+# ╔═╡ d4904ddf-4d5e-426a-80c1-71152ebf4f3b
+md"""
+## 25 ms period w/ 20 ms discretization
+"""
 
 # ╔═╡ a9578595-f100-44dc-89b0-a8926c979acb
 function summer(path, threshold_percent; sigdigits=2)
@@ -67,8 +69,34 @@ function summer(path, threshold_percent; sigdigits=2)
 		end
 	end
 	
+	# @info deviations
 	# @info deviations indices
+	display("text/plain", [deviations; indices])
 	to_show
+end
+
+# ╔═╡ 1406c32e-ce99-4de6-aa29-1d8ee2cf7744
+let
+	summer("data/closeperiod/0.018s_0.02s/RC_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
+	summer("data/closeperiod/0.018s_0.02s/DCM_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
+	summer("data/closeperiod/0.018s_0.02s/CSS_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
+	# summer("data/closeperiod/0.018s_0.02s/CC1_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
+	summer("data/closeperiod/0.018s_0.02s/CC2_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
+	md"""
+	## 18 ms period w/ 20 ms discretization
+	"""
+end
+
+# ╔═╡ 9b273a22-552e-4b35-974e-7675aebf5fa4
+let
+	summer("data/closeperiod/0.015s_0.02s/RC_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
+	summer("data/closeperiod/0.015s_0.02s/DCM_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
+	summer("data/closeperiod/0.015s_0.02s/CSS_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
+	# summer("data/closeperiod/0.015s_0.02s/CC1_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
+	summer("data/closeperiod/0.015s_0.02s/CC2_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
+	md"""
+	## 15 ms period w/ 20 ms discretization
+	"""
 end
 
 # ╔═╡ c4ab5843-067c-44a6-aec9-7f0290f4853a
@@ -77,9 +105,6 @@ summer("data/default/0.02s_0.02s/DCM_HoldAndKill_n5_t100.csv", perc, sigdigits=3
 # ╔═╡ 485404b8-ad5c-4e52-9806-dbc2b6623cef
 summer("data/default/0.02s_0.02s/CSS_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
 
-# ╔═╡ a919cccd-eac3-4894-b33c-bd32b869a4f4
-summer("data/default/0.02s_0.02s/EWB_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
-
 # ╔═╡ 992a17e8-4cc5-4cdb-8ac2-8489d16ad205
 summer("data/default/0.02s_0.02s/CC1_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
 
@@ -87,16 +112,28 @@ summer("data/default/0.02s_0.02s/CC1_HoldAndKill_n5_t100.csv", perc, sigdigits=3
 summer("data/default/0.02s_0.02s/CC2_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
 
 # ╔═╡ ca8f8a4c-ad2b-40a2-8e39-481080d07e44
-summer("data/samedisc/0.005s_0.02s/DCM_HoldAndKill_n5_t100.csv", s520, sigdigits=3)
+summer("data/closeperiod/0.023s_0.02s/DCM_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
 
 # ╔═╡ 7b0c1274-4208-4c1f-b12d-b5647b50f98f
-summer("data/samedisc/0.005s_0.02s/CSS_HoldAndKill_n5_t100.csv", s520, sigdigits=3)
+summer("data/closeperiod/0.023s_0.02s/CSS_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
 
 # ╔═╡ 6124477b-971e-4bdc-9210-1af57b485877
-summer("data/samedisc/0.005s_0.02s/CC1_HoldAndKill_n5_t100.csv", s520, sigdigits=3)
+summer("data/closeperiod/0.023s_0.02s/CC1_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
 
 # ╔═╡ a52aefd5-87d7-490e-9445-3bb230e5d684
-summer("data/samedisc/0.005s_0.02s/CC2_HoldAndKill_n5_t100.csv", s520, sigdigits=3)
+summer("data/closeperiod/0.023s_0.02s/CC2_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
+
+# ╔═╡ 96d1e07a-d0e8-4909-a56f-2aaf273e8e7c
+summer("data/closeperiod/0.025s_0.02s/DCM_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
+
+# ╔═╡ 5e4d593c-1dcf-4f11-8762-6726d35144c4
+summer("data/closeperiod/0.025s_0.02s/CSS_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
+
+# ╔═╡ 87634f75-0eb8-4fd3-b69e-e9d94de4d80f
+summer("data/closeperiod/0.025s_0.02s/CC1_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
+
+# ╔═╡ 8470c142-1539-4a2d-bf26-8698adc6e647
+summer("data/closeperiod/0.025s_0.02s/CC2_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -444,19 +481,24 @@ version = "17.4.0+0"
 # ╔═╡ Cell order:
 # ╠═41a85aac-d357-11ec-3d01-71de103a66ec
 # ╠═e2a0c124-bf14-4fbc-bddb-959d1220581b
+# ╠═1406c32e-ce99-4de6-aa29-1d8ee2cf7744
+# ╠═9b273a22-552e-4b35-974e-7675aebf5fa4
 # ╠═66731c94-e83e-414c-80eb-b37d8ef69724
 # ╠═981a2d06-32a8-4fe8-8b10-c9525f72ddf3
 # ╠═c4ab5843-067c-44a6-aec9-7f0290f4853a
 # ╠═485404b8-ad5c-4e52-9806-dbc2b6623cef
-# ╠═a919cccd-eac3-4894-b33c-bd32b869a4f4
 # ╠═992a17e8-4cc5-4cdb-8ac2-8489d16ad205
 # ╠═3c96a791-8722-4a3f-b071-6231cfb95aa9
-# ╠═0a47ccae-a40d-411b-bb26-3953581997af
-# ╠═b2b73a96-362b-48dd-b441-56188b0661a0
+# ╟─0a47ccae-a40d-411b-bb26-3953581997af
 # ╠═ca8f8a4c-ad2b-40a2-8e39-481080d07e44
 # ╠═7b0c1274-4208-4c1f-b12d-b5647b50f98f
 # ╠═6124477b-971e-4bdc-9210-1af57b485877
 # ╠═a52aefd5-87d7-490e-9445-3bb230e5d684
+# ╟─d4904ddf-4d5e-426a-80c1-71152ebf4f3b
+# ╠═96d1e07a-d0e8-4909-a56f-2aaf273e8e7c
+# ╠═5e4d593c-1dcf-4f11-8762-6726d35144c4
+# ╠═87634f75-0eb8-4fd3-b69e-e9d94de4d80f
+# ╠═8470c142-1539-4a2d-bf26-8698adc6e647
 # ╠═a9578595-f100-44dc-89b0-a8926c979acb
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
