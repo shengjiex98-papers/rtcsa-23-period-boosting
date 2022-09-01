@@ -107,14 +107,14 @@ function create_job(sys_name, x0, periods...; dir="data/default", clr=false)
         mkdir(dir)
     end
 
-    system = sys_map[sys_name]
+    # system = sys_map[sys_name]
 
     n = 5
     t = 100
     max_window_size = 6
     safety_margin = 1000
 
-    q = size(system.A, 1)
+    q = size(sysd_f1.A, 1)
     bounds = repeat([x0 x0], q)
 
     for hs in periods
@@ -125,7 +125,7 @@ function create_job(sys_name, x0, periods...; dir="data/default", clr=false)
         end
 
         strat = HoldAndKill
-        model = (c2d(system, hs[1]), delay_lqr(system, hs[2]))
+        model = (sysd_f1, [0.293511 0.440267])
         
         synthesize_full(safety_margin, bounds, model, sys_name, strat, n, max_window_size, t; dims=[2], dir=subdir, clr=clr)
     end

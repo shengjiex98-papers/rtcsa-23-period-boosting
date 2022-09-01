@@ -14,6 +14,9 @@ path = "data/closeperiod"
 # end
 
 # Same new period, old gain values
-for sys_name in sys_names, period in periods
-    create_job(sys_name, 10, (0.020, period), dir=path, clr=true)
-end
+# for sys_name in sys_names, period in periods
+#     create_job(sys_name, 10, (0.020, period), dir=path, clr=true)
+# end
+
+# F1 0.02, 0.02
+create_job("F1", 0.1, (0.020, 0.020), dir=path, clr=true)
