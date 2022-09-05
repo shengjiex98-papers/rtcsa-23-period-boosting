@@ -13,19 +13,155 @@ end
 TableOfContents()
 
 # ╔═╡ e1e49746-aa18-4064-83c8-cd2e773d38ee
-struct WeaklyHardConstraint
-	minhits::Int 		# Minimum # of hits in a window
-	windowsize::Int 	# The size of the window
+begin
+	struct WeaklyHardConstraint
+		minhits::Int 		# Minimum # of hits in a window
+		windowsize::Int 	# The size of the window
+	end
+	struct Automaton
+		L::Int64			# # of locations. Legal locations are in the range 0:L-1.
+		Σ::Int64			# # of actions. Legal actions are in the range 0:Σ-1.
+		T::Function			# Transition function. T(l,σ) is a location in 0:L-1.
+		l_0::Int64			# Initial location in L.
+		Q_f::Function		# Function that returns whether a location is final
+	end
+	struct SynthesizedAutomaton
+		N::Int64			# # of comprising automata
+		B::Vector{Int64}	# List of bits for all comprising controllers
+		L::Int64			# Locations. Legal locations are in the range 0:L-1.
+		Σ::Vector{Int64}	# List of actions.
+		T::Function			# Transition function.  T(l,σ) is a location in 0:L-1.
+		l_0::Int64			# Initial location in L.
+		Q_f::Function		# Function that returns whether a location is final.
+	end
+
+	[WeaklyHardConstraint, Automaton, SynthesizedAutomaton]
+end
+
+# ╔═╡ 9e4e98f9-ea74-40a5-8fad-ff90002a6a27
+begin
+	"""
+		undigit(d[, base=2])
+	
+	Convert a list of digits to a number. Default base=2.
+	```julia
+	julia> undigit([1, 0, 0])
+	4
+	```
+	"""
+	function undigit(d; base=2)
+	    s = zero(eltype(d))
+	    mult = one(eltype(d))
+	    for val in reverse(d)
+	        s += val * mult
+	        mult *= base
+	    end
+	    return s
+	end
+
+	"""
+		digits_b2r(x[, pad])
+	
+	A shortcut for `digits(x, base=2, pad=pad) |> reverse`
+	"""
+	function digits_b2r(x::Int, pad::Int=0)
+		digits(x, base=2, pad=pad) |> reverse
+	end
+	
+	"""
+		state_separation(l, B[, indigits=false])
+	
+	state_separation takes a number `l` representing the overall state of
+	a `SynthesizedAutomaton` and an array `B` representing the number of bits
+	for each comprising `Automaton` of the `SynthesizedAutomaton` to compute a 
+	list of individual states. For example
+	
+	```julia
+	julia> state_separation(6, [1, 2])
+	[1, 2]
+	```
+	The explanation of the example is as follows
+	```
+	6 -> [1, 1, 0]
+	[1, 1, 0] / [1, 2] -> [[1], [1, 0]]
+	[[1], [1, 0]] -> [1, 2]
+	```
+	"""
+	function state_separation(l, B; indigits=false)
+		@assert l < 2^sum(B) "l has more bits than the sum of B"
+		
+		bits = digits(l, base=2, pad=sum(B)) |> reverse
+		index_points = cumsum(B)
+		bits_separated = [bits[i+1:j] for (i, j) in zip([0; index_points[1:end-1]], index_points)]
+		if indigits
+			state_separated = bits_separated
+		else
+			state_separated = map(undigit, bits_separated)
+		end
+	end
+
+	[undigit, digits_b2r, state_separation]
 end
 
 # ╔═╡ 58899f1b-03c9-4d0e-b49b-083b1d63b2fa
-struct Automaton
-	L::Int64			# # of locations. Legal locations are in the range 0:L-1.
-	Σ::Int64			# # of actions. Legal actions are in the range 0:Σ-1.
-	T::Function			# Transition function. T(l,σ) is a location in 0:L-1.
-	l_0::Int64			# Initial location in L.
-	Q_f::Function		# Function that returns whether a location is final
+begin
+	function AbstractControllerAutomaton(c::WeaklyHardConstraint)
+		# Define the automaton's structure. State l=0 is the dead state (trapping)
+		if c.minhits == 0					# No requirement. Always valid.
+			L = 2
+			T = (l, σ) -> 1
+		elseif c.minhits == c.windowsize	# No misses allowed.
+			L = 2
+			T = (l, σ) -> l & σ
+		else								# Dead state is l = 1
+			L = 2^c.windowsize
+			T = function (l, σ)
+				l_new = (l << 1) & (L - 1) | σ
+				l == 0 || count_ones(l_new) < c.minhits ? 0 : l_new
+			end
+		end
+		
+		# Put it all together. Starting position is L-1 since there is no miss from the beginning
+		Automaton(L, 2, T, L-1, !iszero)
+	end
+	
+	function SchedulerAutomaton(controllers::Automaton...; cores=1)
+		# Converting tuple to array with collect()
+		N = length(controllers)
+		B = map(a -> ceil(Int64, log2(a.L)), controllers) |> collect
+		L = 2^sum(B)
+	
+		all_actions = 0:2^length(controllers)-1
+		Σ = filter(σ -> count_ones(σ) <= cores, all_actions)
+	
+		function T(l::Int, σ::Int)
+			@assert l < L "Illegal location"
+			@assert σ in Σ "Illegal action"
+			states = state_separation(l, B)
+			actions = digits_b2r(σ, N)
+			# @info σ, actions
+			new_locations = map((controller, l, σ) -> controller.T(l, σ), controllers, states, actions)
+			# @info states, actions, new_locations
+			new_location_bits = map((x, y) -> digits_b2r(x, y), new_locations, B)
+			# @info new_location_bits
+			result = Iterators.flatten(new_location_bits) |> collect |> undigit
+			# @info digits_b2r(result)
+			result
+		end
+	
+		function Q_f(l::Int)
+			states = state_separation(l, B);
+			all(map((c, l) -> c.Q_f(l), controllers, states))
+		end
+	
+		SynthesizedAutomaton(N, B, L, Σ, T, L-1, Q_f)
+	end
+
+	[AbstractControllerAutomaton, SchedulerAutomaton]
 end
+
+# ╔═╡ 84aca27f-c6d3-4824-892d-444fdc36d612
+
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -42,7 +178,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.0"
 manifest_format = "2.0"
-project_hash = "502a5e5263da26fcd619b7b7033f402a42a81ffc"
+project_hash = "6ff2529dffd0652d0349be095d4d180abf958f56"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -273,7 +409,9 @@ version = "17.4.0+0"
 # ╔═╡ Cell order:
 # ╠═3b81315c-2a0b-11ed-0388-471cd2cb6d84
 # ╠═d2fe79ad-3b5f-461c-be6f-f3e7aaafe8fa
-# ╠═e1e49746-aa18-4064-83c8-cd2e773d38ee
-# ╠═58899f1b-03c9-4d0e-b49b-083b1d63b2fa
+# ╟─e1e49746-aa18-4064-83c8-cd2e773d38ee
+# ╟─9e4e98f9-ea74-40a5-8fad-ff90002a6a27
+# ╟─58899f1b-03c9-4d0e-b49b-083b1d63b2fa
+# ╠═84aca27f-c6d3-4824-892d-444fdc36d612
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
