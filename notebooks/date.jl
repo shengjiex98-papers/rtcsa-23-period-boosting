@@ -232,14 +232,15 @@ begin
 	"""
 	function load_result(path, threshold_ratio)
 		d = readdlm(path, ',', Float64)
-		d = round.(d; digits=2)
+		d = round.(d; sigdigits=3)
 		w = size(d, 2)
 		deviations = d[1:w,:]
 		indices    = d[w+1:2w,:]
+		# @info deviations
 
 		min_v = minimum(x -> isnan(x) ? Inf  : x, deviations)
 		max_v = maximum(x -> isnan(x) ? -Inf : x, deviations)
-		threshold = min_v + (max_v - min_v) * threshold_ratio
+		threshold = round(min_v + (max_v - min_v) * threshold_ratio, sigdigits=3)
 	
 		to_show = fill(NaN, size(deviations))
 		constraints = Vector{WeaklyHardConstraint}()
@@ -257,7 +258,7 @@ begin
 		end
 		
 		# @info "Full results" to_show deviations indices
-		@info threshold
+		@info "Stats" deviations threshold
 		constraints
 	end
 
@@ -268,12 +269,12 @@ end
 md"""
 | System | WCET | Period | Safety Margin |
 | ------ | ---- | ------ | ------------- |
-| RC     | 10ms | 28ms   | 0.015         |
-| F1     | 13ms | 28ms   | 864.64        |
-| DCM    | 12ms | 28ms   | 0.031         |
-| CSS    | 10ms | 28ms   | 82.875        |
+| RC     | 10ms | 23ms   | 0.0159        |
+| F1     | 13ms | 20ms   | 1520.0        |
+| DCM    | 12ms | 23ms   | 0.0336        |
+| CSS    | 10ms | 27ms   | 57.5          |
 | CC     | 15ms | 28ms   | 1.05          |
-Utilization $$U = \frac{15}{7} > 1$$
+Utilization $$U \approx 2.51 > 1$$
 """
 
 # ╔═╡ 470a7307-82a4-4a30-a308-6d8ade16a2f4
@@ -283,13 +284,13 @@ prefix = "../experiments/data/common_period/"
 @bind threshold_rc Slider(0:0.01:1, default=0.5, show_value=true)
 
 # ╔═╡ f17e5f30-8dbb-4079-a22b-d79b05aedbed
-rc = load_result(prefix * "0.028s_0.02s/RC_HoldAndKill_n5_t100.csv", threshold_rc)
+rc = load_result(prefix * "0.028s_0.023s/RC_HoldAndKill_n5_t100.csv", threshold_rc)
 
 # ╔═╡ 421842ca-442c-499f-8ff5-1ac46d53e67e
 @bind threshold_f1 Slider(0:0.01:1, default=0.5, show_value=true)
 
 # ╔═╡ e3f33864-27e5-4bff-be7f-942d3a8cdaf8
-f1 = load_result("../experiments/data/closeperiod/0.02s_0.02s/F1_HoldAndKill_n5_t100.csv", threshold_f1)
+f1 = load_result("../experiments/data/common_period/0.028s_0.02s/F1_HoldAndKill_n5_t100.csv", threshold_f1)
 
 # ╔═╡ f37293d5-3ba0-4abf-898a-8d500d11302e
 @bind threshold_dcm Slider(0:0.01:1, default=0.5, show_value=true)
@@ -301,7 +302,7 @@ dcm = load_result(prefix * "0.028s_0.023s/DCM_HoldAndKill_n5_t100.csv", threshol
 @bind threshold_css Slider(0:0.01:1, default=0.5, show_value=true)
 
 # ╔═╡ 076dc76e-b93c-4642-a189-5bf233ba4eb0
-css = load_result(prefix * "0.028s_0.022s/CC2_HoldAndKill_n5_t100.csv", threshold_css)
+css = load_result(prefix * "0.028s_0.027s/CC2_HoldAndKill_n5_t100.csv", threshold_css)
 
 # ╔═╡ adb5ed1f-d1ab-4eda-a362-5fd26e98b6c7
 @bind threshold_cc2 Slider(0:0.01:1, default=0.5, show_value=true)
@@ -336,7 +337,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.0"
 manifest_format = "2.0"
-project_hash = "94c517516822e4171792cc419b17f39f0c3a2e7d"
+project_hash = "2ff104bdee91d2b2e23bdc6364e673ea35697286"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -594,7 +595,7 @@ version = "17.4.0+0"
 # ╠═84aca27f-c6d3-4824-892d-444fdc36d612
 # ╠═ea5ec578-0d5e-4c40-8082-8b806d2b5e99
 # ╠═470a7307-82a4-4a30-a308-6d8ade16a2f4
-# ╟─57c2fd32-48b2-4a53-9bb3-96f28ef6c70b
+# ╠═57c2fd32-48b2-4a53-9bb3-96f28ef6c70b
 # ╠═f17e5f30-8dbb-4079-a22b-d79b05aedbed
 # ╟─421842ca-442c-499f-8ff5-1ac46d53e67e
 # ╠═e3f33864-27e5-4bff-be7f-942d3a8cdaf8

@@ -18,13 +18,25 @@ sys_rc = let
 	ss(A, B, C, D)
 end
 
-# This is discretized with period h=0.02s
-sysd_f1 = let
-	A = [1 0.13; 0 1];
-	B = [0.02559055118110236; 0.39370078740157477];
-	C = [0 0];
-	D = [0];
-	ss(A, B, C, D, 0.02)
+# # This is discretized with period h=0.02s
+# sysd_f1 = let
+# 	A = [1 0.13; 0 1];
+# 	B = [0.02559055118110236; 0.39370078740157477];
+# 	C = [0 0];
+# 	D = [0];
+# 	ss(A, B, C, D, 0.02)
+# end
+
+sys_f1 = let 
+    v = 6.5
+    L = 0.3302
+    d = 1.5
+    A = [0 v ; 0 0]
+    B = [0; v/L]
+    C = [1 0]
+    D = 0
+
+    ss(A, B, C, D)
 end
 
 sys_dcm = let
@@ -92,6 +104,7 @@ end
 # )
 sys_map = Dict(
     "RC" => sys_rc,
+    "F1" => sys_f1,
     "DCM" => sys_dcm,
     "CSS" => sys_css,
     # "EWB" => sys_ewb,

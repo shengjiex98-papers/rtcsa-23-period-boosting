@@ -12,9 +12,9 @@ using Combinatorics
 
 execution_times = Dict(
     "RC" => 0.010,
-    "DCM" => 0.013,
-    "CSS" => 0.012,
-    "CC1" => 0.010,
+    "F1" => 0.013,
+    "DCM" => 0.012,
+    "CSS" => 0.010,
     "CC2" => 0.015
 )
 
@@ -29,10 +29,12 @@ end
 periods = common_period(execution_times)
 path = "data/common_period"
 
+sys_names = ["F1"]
+
 # Recomputed gain values
-# for sys_name in sys_names, period in periods
-#     create_job(sys_name, 1, (period, period), dir=path, clr=true)
-# end
+for sys_name in sys_names, period in periods
+    create_job(sys_name, 1, (period, period), dir=path, clr=true)
+end
 
 # Old gain values
 for sys_name in sys_names, period in periods
