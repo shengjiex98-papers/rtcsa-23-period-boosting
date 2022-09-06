@@ -4,9 +4,21 @@
 using Markdown
 using InteractiveUtils
 
+# This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
+macro bind(def, element)
+    quote
+        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
+        local el = $(esc(element))
+        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
+        el
+    end
+end
+
 # ╔═╡ 3b81315c-2a0b-11ed-0388-471cd2cb6d84
 begin
 	using PlutoUI
+	using DelimitedFiles
+	using DataStructures
 end
 
 # ╔═╡ d2fe79ad-3b5f-461c-be6f-f3e7aaafe8fa
@@ -161,14 +173,160 @@ begin
 end
 
 # ╔═╡ 84aca27f-c6d3-4824-892d-444fdc36d612
+begin
+	"""
+		isschedulable(constraints...; cores=1, steps=100)
 
+	Test if a set of tasks are schedulable. Each task has a list of constraints and and at each time slot, at most a few number of controllers can be run.
+	"""
+	function isschedulable(constraints...; cores=1, steps=100)
+		utilization = sum(c -> c.minhits/c.windowsize, constraints)
+		if utilization > cores
+			# @info "Utilization exceeding number of cores" utilization
+			return Vector{Int64}()
+		end
+	
+		controllers = AbstractControllerAutomaton.(constraints)
+		a = SchedulerAutomaton(controllers..., cores=cores)
+	
+		# cycle_detect = Set{Int64}(a.l_0)
+		# path = Dict{Int64, Vector{Int64}}(a.l_0=>[a.l_0])
+		current_states = Dict{Int64, Cons{Int64}}(a.l_0=>list(a.l_0))
+	
+		for step in 1:steps
+			next_states = Dict{Int64, Cons{Int64}}()
+			for (l, path) in pairs(current_states), σ in a.Σ
+				l_new = a.T(l, σ)
+				if !a.Q_f(l_new) || haskey(next_states, l_new)
+					continue
+				elseif l_new in path
+					# @info "Cycle detected, returning early"
+					return reverse(cons(l_new, path))
+				end
+				next_states[l_new] = cons(l_new, path)
+			end
+			if isempty(next_states)
+				# some_non_readable_nonsense = [map(l -> state_separation(l, [c.windowsize for c in constraints], indigits=true), reverse(path)) |> collect for path in values(current_states)]
+				# @info "Deat at step=$step" constraints some_non_readable_nonsense[1] some_non_readable_nonsense[2] some_non_readable_nonsense[3] some_non_readable_nonsense[4]
+				@info "Utilization is ok but no schedule found" constraints current_states
+				return Vector{Int64}()
+			end
+				
+			current_states = next_states
+		end
+	
+		for (l, path) in pairs(current_states)
+			if a.Q_f(l)
+				return reverse(path)
+			end
+		end
+	
+		@info "Utilization is ok but no schedule found" constraints current_states
+		Vector{Int64}()
+	end
+	
+	"""
+		load_result(path, threashold)
+	
+	Load the result (in `.csv` format) from the file system, and present the result according to the threashold value.
+	"""
+	function load_result(path, threshold_ratio)
+		d = readdlm(path, ',', Float64)
+		d = round.(d; digits=2)
+		w = size(d, 2)
+		deviations = d[1:w,:]
+		indices    = d[w+1:2w,:]
+
+		min_v = minimum(x -> isnan(x) ? Inf  : x, deviations)
+		max_v = maximum(x -> isnan(x) ? -Inf : x, deviations)
+		threshold = min_v + (max_v - min_v) * threshold_ratio
+	
+		to_show = fill(NaN, size(deviations))
+		constraints = Vector{WeaklyHardConstraint}()
+		
+		min_hits = 1
+		for window_size in 2:w+1
+			while min_hits < window_size
+				if deviations[window_size-1, min_hits] <= threshold
+					to_show[window_size-1, min_hits] = deviations[window_size-1, min_hits]
+					push!(constraints, WeaklyHardConstraint(min_hits, window_size))
+					break
+				end
+				min_hits += 1
+			end
+		end
+		
+		# @info "Full results" to_show deviations indices
+		@info threshold
+		constraints
+	end
+
+	[isschedulable, load_result]
+end
+
+# ╔═╡ ea5ec578-0d5e-4c40-8082-8b806d2b5e99
+md"""
+| System | WCET | Period | Safety Margin |
+| ------ | ---- | ------ | ------------- |
+| RC     | 10ms | 28ms   | 0.015         |
+| F1     | 13ms | 28ms   | 864.64        |
+| DCM    | 12ms | 28ms   | 0.031         |
+| CSS    | 10ms | 28ms   | 82.875        |
+| CC     | 15ms | 28ms   | 1.05          |
+Utilization $$U = \frac{15}{7} > 1$$
+"""
+
+# ╔═╡ 470a7307-82a4-4a30-a308-6d8ade16a2f4
+prefix = "../experiments/data/common_period/"
+
+# ╔═╡ 57c2fd32-48b2-4a53-9bb3-96f28ef6c70b
+@bind threshold_rc Slider(0:0.01:1, default=0.5, show_value=true)
+
+# ╔═╡ f17e5f30-8dbb-4079-a22b-d79b05aedbed
+rc = load_result(prefix * "0.028s_0.02s/RC_HoldAndKill_n5_t100.csv", threshold_rc)
+
+# ╔═╡ 421842ca-442c-499f-8ff5-1ac46d53e67e
+@bind threshold_f1 Slider(0:0.01:1, default=0.5, show_value=true)
+
+# ╔═╡ e3f33864-27e5-4bff-be7f-942d3a8cdaf8
+f1 = load_result("../experiments/data/closeperiod/0.02s_0.02s/F1_HoldAndKill_n5_t100.csv", threshold_f1)
+
+# ╔═╡ f37293d5-3ba0-4abf-898a-8d500d11302e
+@bind threshold_dcm Slider(0:0.01:1, default=0.5, show_value=true)
+
+# ╔═╡ 4d862328-ca2f-4656-a296-e08237fd3150
+dcm = load_result(prefix * "0.028s_0.023s/DCM_HoldAndKill_n5_t100.csv", threshold_dcm)
+
+# ╔═╡ b3dd90f5-c87d-4d67-8094-3eaf836033f0
+@bind threshold_css Slider(0:0.01:1, default=0.5, show_value=true)
+
+# ╔═╡ 076dc76e-b93c-4642-a189-5bf233ba4eb0
+css = load_result(prefix * "0.028s_0.022s/CC2_HoldAndKill_n5_t100.csv", threshold_css)
+
+# ╔═╡ adb5ed1f-d1ab-4eda-a362-5fd26e98b6c7
+@bind threshold_cc2 Slider(0:0.01:1, default=0.5, show_value=true)
+
+# ╔═╡ 71875c91-2167-4fa6-a26d-91f779269796
+cc2 = load_result(prefix * "0.028s_0.028s/CC2_HoldAndKill_n5_t100.csv", threshold_cc2)
+
+# ╔═╡ 29e7a702-5ef4-4f1f-bfcb-5a0b69621749
+for c1 in rc, c2 in f1, c3 in dcm, c4 in css, c5 in cc2
+	path = isschedulable(c1, c2, c3, c4, c5, cores=2)
+	if length(path) > 0
+		@info "Found results" c1 c2 c3 c4 c5 map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
+		break
+	end
+end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
+DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 
 [compat]
+DataStructures = "~0.18.13"
 PlutoUI = "~0.7.39"
 """
 
@@ -178,7 +336,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.0"
 manifest_format = "2.0"
-project_hash = "6ff2529dffd0652d0349be095d4d180abf958f56"
+project_hash = "94c517516822e4171792cc419b17f39f0c3a2e7d"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -202,14 +360,30 @@ git-tree-sha1 = "eb7f0f8307f71fac7c606984ea5fb2817275d6e4"
 uuid = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
 version = "0.11.4"
 
+[[deps.Compat]]
+deps = ["Dates", "LinearAlgebra", "UUIDs"]
+git-tree-sha1 = "5856d3031cdb1f3b2b6340dfdc66b6d9a149a374"
+uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
+version = "4.2.0"
+
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
 version = "0.5.2+0"
 
+[[deps.DataStructures]]
+deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
+git-tree-sha1 = "d1fff3a548102f48987a52a2e0d114fa97d730f0"
+uuid = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
+version = "0.18.13"
+
 [[deps.Dates]]
 deps = ["Printf"]
 uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
+
+[[deps.DelimitedFiles]]
+deps = ["Mmap"]
+uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 
 [[deps.Downloads]]
 deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
@@ -306,6 +480,11 @@ version = "1.2.0"
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
 uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
 version = "0.3.20+0"
+
+[[deps.OrderedCollections]]
+git-tree-sha1 = "85f8e6578bf1f9ee0d11e7bb1b1456435479d47c"
+uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
+version = "1.4.1"
 
 [[deps.Parsers]]
 deps = ["Dates"]
@@ -413,5 +592,18 @@ version = "17.4.0+0"
 # ╟─9e4e98f9-ea74-40a5-8fad-ff90002a6a27
 # ╟─58899f1b-03c9-4d0e-b49b-083b1d63b2fa
 # ╠═84aca27f-c6d3-4824-892d-444fdc36d612
+# ╠═ea5ec578-0d5e-4c40-8082-8b806d2b5e99
+# ╠═470a7307-82a4-4a30-a308-6d8ade16a2f4
+# ╟─57c2fd32-48b2-4a53-9bb3-96f28ef6c70b
+# ╠═f17e5f30-8dbb-4079-a22b-d79b05aedbed
+# ╟─421842ca-442c-499f-8ff5-1ac46d53e67e
+# ╠═e3f33864-27e5-4bff-be7f-942d3a8cdaf8
+# ╟─f37293d5-3ba0-4abf-898a-8d500d11302e
+# ╠═4d862328-ca2f-4656-a296-e08237fd3150
+# ╟─b3dd90f5-c87d-4d67-8094-3eaf836033f0
+# ╠═076dc76e-b93c-4642-a189-5bf233ba4eb0
+# ╠═adb5ed1f-d1ab-4eda-a362-5fd26e98b6c7
+# ╠═71875c91-2167-4fa6-a26d-91f779269796
+# ╠═29e7a702-5ef4-4f1f-bfcb-5a0b69621749
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

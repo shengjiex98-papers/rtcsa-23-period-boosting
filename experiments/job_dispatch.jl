@@ -30,18 +30,18 @@ periods = common_period(execution_times)
 path = "data/common_period"
 
 # Recomputed gain values
-for sys_name in sys_names, period in periods
-    create_job(sys_name, 1, (period, period), dir=path, clr=true)
-end
+# for sys_name in sys_names, period in periods
+#     create_job(sys_name, 1, (period, period), dir=path, clr=true)
+# end
 
 # Old gain values
 for sys_name in sys_names, period in periods
-    create_job(sys_name, 1, (period, 0.020), dir=path, clr=true)
+    create_job(sys_name, 1, (period, 0.028), dir=path, clr=true)
 end
 
 # Same new period, old gain values
 for sys_name in sys_names, period in periods
-    create_job(sys_name, 1, (0.020, period), dir=path, clr=true)
+    create_job(sys_name, 1, (0.028, period), dir=path, clr=true)
 end
 
 # # F1 0.02, 0.02

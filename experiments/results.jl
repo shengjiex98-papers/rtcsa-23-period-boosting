@@ -24,26 +24,6 @@ end
 
 # ╔═╡ e2a0c124-bf14-4fbc-bddb-959d1220581b
 # Logging.loglevel(Logging.Warn)
-
-# ╔═╡ 66731c94-e83e-414c-80eb-b37d8ef69724
-md"""
-## 20 ms period w/ 20 ms discretization
-"""
-
-# ╔═╡ 981a2d06-32a8-4fe8-8b10-c9525f72ddf3
-@bind perc Slider(0:0.01:1, show_value=true)
-
-# ╔═╡ 0a47ccae-a40d-411b-bb26-3953581997af
-md"""
-## 23 ms period w/ 20 ms discretization
-"""
-
-# ╔═╡ d4904ddf-4d5e-426a-80c1-71152ebf4f3b
-md"""
-## 25 ms period w/ 20 ms discretization
-"""
-
-# ╔═╡ a9578595-f100-44dc-89b0-a8926c979acb
 function summer(path, threshold_percent; sigdigits=2)
 	d = readdlm(path, ',', Float64)
 	d = round.(d; sigdigits=sigdigits)
@@ -75,6 +55,14 @@ function summer(path, threshold_percent; sigdigits=2)
 	to_show
 end
 
+# ╔═╡ 66731c94-e83e-414c-80eb-b37d8ef69724
+md"""
+## 20 ms period w/ 20 ms discretization
+"""
+
+# ╔═╡ 981a2d06-32a8-4fe8-8b10-c9525f72ddf3
+@bind perc Slider(0:0.01:1, show_value=true)
+
 # ╔═╡ 1406c32e-ce99-4de6-aa29-1d8ee2cf7744
 let
 	summer("data/closeperiod/0.018s_0.02s/RC_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
@@ -99,17 +87,25 @@ let
 	"""
 end
 
+# ╔═╡ b73c20d7-6271-4533-b986-54289e9b357b
+summer("data/common_period/0.02s_0.02s/RC_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
+
 # ╔═╡ c4ab5843-067c-44a6-aec9-7f0290f4853a
-summer("data/default/0.02s_0.02s/DCM_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
+summer("data/common_period/0.02s_0.02s/DCM_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
 
 # ╔═╡ 485404b8-ad5c-4e52-9806-dbc2b6623cef
-summer("data/default/0.02s_0.02s/CSS_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
+summer("data/common_period/0.02s_0.02s/CSS_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
 
 # ╔═╡ 992a17e8-4cc5-4cdb-8ac2-8489d16ad205
-summer("data/default/0.02s_0.02s/CC1_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
+summer("data/common_period/0.02s_0.02s/CC1_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
 
 # ╔═╡ 3c96a791-8722-4a3f-b071-6231cfb95aa9
 summer("data/default/0.02s_0.02s/CC2_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
+
+# ╔═╡ 0a47ccae-a40d-411b-bb26-3953581997af
+md"""
+## 23 ms period w/ 20 ms discretization
+"""
 
 # ╔═╡ ca8f8a4c-ad2b-40a2-8e39-481080d07e44
 summer("data/closeperiod/0.023s_0.02s/DCM_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
@@ -122,6 +118,11 @@ summer("data/closeperiod/0.023s_0.02s/CC1_HoldAndKill_n5_t100.csv", perc, sigdig
 
 # ╔═╡ a52aefd5-87d7-490e-9445-3bb230e5d684
 summer("data/closeperiod/0.023s_0.02s/CC2_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
+
+# ╔═╡ d4904ddf-4d5e-426a-80c1-71152ebf4f3b
+md"""
+## 25 ms period w/ 20 ms discretization
+"""
 
 # ╔═╡ 96d1e07a-d0e8-4909-a56f-2aaf273e8e7c
 summer("data/closeperiod/0.025s_0.02s/DCM_HoldAndKill_n5_t100.csv", perc, sigdigits=3)
@@ -485,6 +486,7 @@ version = "17.4.0+0"
 # ╠═9b273a22-552e-4b35-974e-7675aebf5fa4
 # ╠═66731c94-e83e-414c-80eb-b37d8ef69724
 # ╠═981a2d06-32a8-4fe8-8b10-c9525f72ddf3
+# ╠═b73c20d7-6271-4533-b986-54289e9b357b
 # ╠═c4ab5843-067c-44a6-aec9-7f0290f4853a
 # ╠═485404b8-ad5c-4e52-9806-dbc2b6623cef
 # ╠═992a17e8-4cc5-4cdb-8ac2-8489d16ad205
@@ -499,6 +501,5 @@ version = "17.4.0+0"
 # ╠═5e4d593c-1dcf-4f11-8762-6726d35144c4
 # ╠═87634f75-0eb8-4fd3-b69e-e9d94de4d80f
 # ╠═8470c142-1539-4a2d-bf26-8698adc6e647
-# ╠═a9578595-f100-44dc-89b0-a8926c979acb
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
