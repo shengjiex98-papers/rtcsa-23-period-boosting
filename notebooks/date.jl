@@ -233,7 +233,7 @@ begin
 	
 	Load the result (in `.csv` format) from the file system, and present the result according to the threashold value.
 	"""
-	function load_result(path, threshold_ratio)
+	function load_result(path, threshold_ratio, percentmode=true)
 		d = readdlm(path, ',', Float64)
 		d = round.(d; sigdigits=3)
 		w = size(d, 2)
@@ -241,9 +241,13 @@ begin
 		indices    = d[w+1:2w,:]
 		# @info deviations
 
-		min_v = minimum(x -> isnan(x) ? Inf  : x, deviations)
-		max_v = maximum(x -> isnan(x) ? -Inf : x, deviations)
-		threshold = round(min_v + (max_v - min_v) * threshold_ratio, sigdigits=3)
+		if percentmode
+			min_v = minimum(x -> isnan(x) ? Inf  : x, deviations)
+			max_v = maximum(x -> isnan(x) ? -Inf : x, deviations)
+			threshold = round(min_v + (max_v - min_v) * threshold_ratio, sigdigits=3)
+		else
+			threshold = threshold_ratio
+		end
 	
 		to_show = fill(NaN, size(deviations))
 		constraints = Vector{WeaklyHardConstraint}()
@@ -272,9 +276,9 @@ end
 md"""
 | System | WCET | Period | Safety Margin |
 | ------ | ---- | ------ | ------------- |
-| RC     | 10ms | 23ms   | 0.0159        |
-| F1     | 13ms | 20ms   | 1520.0        |
-| DCM    | 12ms | 23ms   | 0.0336        |
+| RC     | 10ms | 23ms   | 1.59          |
+| F1     | 13ms | 20ms   | 3.41          |
+| DCM    | 12ms | 23ms   | 3.36          |
 | CSS    | 10ms | 27ms   | 57.5          |
 | CC     | 15ms | 28ms   | 1.05          |
 Utilization $$U \approx 2.51 > 1$$
@@ -287,22 +291,22 @@ prefix = "../experiments/data/common_period/"
 @bind threshold_rc Slider(0:0.01:1, default=0.58, show_value=true)
 
 # ╔═╡ f17e5f30-8dbb-4079-a22b-d79b05aedbed
-rc = load_result(prefix * "0.028s_0.023s/RC_HoldAndKill_n5_t100.csv", threshold_rc)
+rc = load_result("../experiments/data/common_period_names/0.028s_0.023s/RC_100_n5_t100.csv", threshold_rc)
 
 # ╔═╡ 421842ca-442c-499f-8ff5-1ac46d53e67e
-@bind threshold_f1 Slider(0:0.01:1, default=0.77, show_value=true)
+@bind threshold_f1 Slider(0:0.01:4, default=3.41, show_value=true)
 
 # ╔═╡ e3f33864-27e5-4bff-be7f-942d3a8cdaf8
-f1 = load_result("../experiments/data/common_period/0.028s_0.02s/F1_HoldAndKill_n5_t100.csv", threshold_f1)
+f1 = load_result("../experiments/data/common_period_names/0.028s_0.02s/F1_1_n10_t100.csv", threshold_f1, false)
 
 # ╔═╡ f37293d5-3ba0-4abf-898a-8d500d11302e
 @bind threshold_dcm Slider(0:0.01:1, default=0.66, show_value=true)
 
 # ╔═╡ 4d862328-ca2f-4656-a296-e08237fd3150
-dcm = load_result(prefix * "0.028s_0.023s/DCM_HoldAndKill_n5_t100.csv", threshold_dcm)
+dcm = load_result("../experiments/data/common_period_names/0.028s_0.023s/DCM_100_n5_t100.csv", threshold_dcm)
 
 # ╔═╡ b3dd90f5-c87d-4d67-8094-3eaf836033f0
-@bind threshold_css Slider(0:0.01:1, default=0.33, show_value=true)
+@bind threshold_css Slider(0:0.01:1, default=0.34, show_value=true)
 
 # ╔═╡ 076dc76e-b93c-4642-a189-5bf233ba4eb0
 css = load_result(prefix * "0.028s_0.027s/CC2_HoldAndKill_n5_t100.csv", threshold_css)

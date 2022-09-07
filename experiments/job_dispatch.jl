@@ -11,7 +11,7 @@ execution_times = Dict(
 
 # function common_period(execution_times, num_controllers)
 function common_period(execution_times, num_controllers=2)
-    return Set(sum.(collect(combinations(collect(values(execution_times)), num_controllers))))
+    return Set(round.(sum.(collect(combinations(collect(values(execution_times)), num_controllers))), sigdigits=2))
 end
 
 @info common_period(execution_times)
@@ -23,9 +23,13 @@ path = "data/common_period_names"
 sys_names = ["RC"]
 x_0 = 100
 
+create_job("F1", 1, (0.028, 0.020), dir=path, clr=false)
+# create_job("CC2", 1, (0.028, 0.028), dir=path, clr=false)
+# create_job("CSS", 100, (0.028, 0.02), dir=path, clr=false)
+
 # Recomputed gain values
-for sys_name in sys_names, period in periods
-    create_job(sys_name, x_0, (period, period), dir=path, clr=false)
-    create_job(sys_name, x_0, (period, 0.028), dir=path, clr=false)
-    create_job(sys_name, x_0, (0.028, period), dir=path, clr=false)
-end
+# for sys_name in sys_names, period in periods
+#     create_job(sys_name, x_0, (period, period), dir=path, clr=false)
+#     create_job(sys_name, x_0, (period, 0.028), dir=path, clr=false)
+#     create_job(sys_name, x_0, (0.028, period), dir=path, clr=false)
+# end

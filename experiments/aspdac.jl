@@ -46,7 +46,7 @@ function synthesize_full(safety_margin, bounds, model, name, strat, n, max_windo
 		fullpath = "$(rstrip(dir, '/'))/$(name)_$(bounds[1])_$(min_hits)_$(window_size)_n$(n)_t$(t).csv"
 		if !clr && isfile(fullpath)
 			# @info "Full path is" fullpath
-			v, i, time_elapsed = readdlm(fullpath, ',', Float64, '\n')
+			v, i, time_elapsed = readdlm(fullpath, ',', Float64)
 			@info "Constraint: $(constraint)... loaded from file." (v, i)
 		else
 			start = time()
