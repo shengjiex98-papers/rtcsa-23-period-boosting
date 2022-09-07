@@ -43,7 +43,7 @@ function synthesize_full(safety_margin, bounds, model, name, strat, n, max_windo
 		@info "Working on constraint: $(constraint)..."
 		min_hits, window_size = constraint
 
-		fullpath = "$(rstrip(dir, '/'))/$(name)_$(strat)_$(min_hits)_$(window_size)_n$(n)_t$(t).csv"
+		fullpath = "$(rstrip(dir, '/'))/$(name)_$(bounds[1])_$(min_hits)_$(window_size)_n$(n)_t$(t).csv"
 		if !clr && isfile(fullpath)
 			# @info "Full path is" fullpath
 			v, i, time_elapsed = readdlm(fullpath, ',', Float64, '\n')
@@ -70,7 +70,7 @@ function synthesize_full(safety_margin, bounds, model, name, strat, n, max_windo
 	
 	# @save "data/$(name)_$(strat).jld" deviations indices time_taken
 	
-	fullpath = "$(rstrip(dir, '/'))/$(name)_$(strat)_n$(n)_t$(t).csv"
+	fullpath = "$(rstrip(dir, '/'))/$(name)_$(bounds[1])_n$(n)_t$(t).csv"
 	open(fullpath, "w") do file
 		writedlm(file, [deviations; indices; time_taken], ',')
 	end

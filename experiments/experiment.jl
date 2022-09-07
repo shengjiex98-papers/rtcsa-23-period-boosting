@@ -108,7 +108,7 @@ sys_map = Dict(
     "DCM" => sys_dcm,
     "CSS" => sys_css,
     # "EWB" => sys_ewb,
-    "CC1" => sys_cc1,
+    # "CC1" => sys_cc1,
     "CC2" => sys_cc2
 )
 sys_names = sort([keys(sys_map)...])

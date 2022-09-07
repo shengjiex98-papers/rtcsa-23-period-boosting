@@ -1,15 +1,6 @@
 include("experiment.jl")
 using Combinatorics
 
-# sys_map = Dict(
-#     "RC" => sys_rc,
-#     "DCM" => sys_dcm,
-#     "CSS" => sys_css,
-#     # "EWB" => sys_ewb,
-#     "CC1" => sys_cc1,
-#     "CC2" => sys_cc2
-# )
-
 execution_times = Dict(
     "RC" => 0.010,
     "F1" => 0.013,
@@ -27,24 +18,14 @@ end
 
 # periods = [0.020, 0.023, 0.025, 0.027, 0.018, 0.015]
 periods = common_period(execution_times)
-path = "data/common_period"
+path = "data/common_period_names"
 
-sys_names = ["F1"]
+sys_names = ["RC"]
+x_0 = 100
 
 # Recomputed gain values
 for sys_name in sys_names, period in periods
-    create_job(sys_name, 1, (period, period), dir=path, clr=true)
+    create_job(sys_name, x_0, (period, period), dir=path, clr=false)
+    create_job(sys_name, x_0, (period, 0.028), dir=path, clr=false)
+    create_job(sys_name, x_0, (0.028, period), dir=path, clr=false)
 end
-
-# Old gain values
-for sys_name in sys_names, period in periods
-    create_job(sys_name, 1, (period, 0.028), dir=path, clr=true)
-end
-
-# Same new period, old gain values
-for sys_name in sys_names, period in periods
-    create_job(sys_name, 1, (0.028, period), dir=path, clr=true)
-end
-
-# # F1 0.02, 0.02
-# create_job("F1", 0.1, (0.020, 0.020), dir=path, clr=true)
