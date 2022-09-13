@@ -86,7 +86,7 @@ function synthesize_one(safety_margin, bounds, model, name, strat, n, min_hits, 
 	if !clr && isfile(fullpath)
 		# @info "Full path is" fullpath
 		v, i, time_elapsed = readdlm(fullpath, ',', Float64)
-		@info "Constraint: $(constraint)... loaded from file." (v, i)
+		@info "Constraint: $((min_hits, window_size))... loaded from file." (v, i)
 	else
 		start = time()
 		automaton = strat(model[1], model[2], window_size-min_hits, window_size)
@@ -99,7 +99,7 @@ function synthesize_one(safety_margin, bounds, model, name, strat, n, min_hits, 
 		open(fullpath, "w") do file
 			writedlm(file, [v; i; time_elapsed], ',')
 		end
-		@info "Constraint: $(constraint)... done in $(round(time_elapsed, digits=2)) seconds." (v, i)
+		@info "Constraint: $((min_hits, window_size))... done in $(round(time_elapsed, digits=2)) seconds." (v, i)
 	end
 	
 	@info "Synthesizing finished for" name strat (v, i, time_elapsed)

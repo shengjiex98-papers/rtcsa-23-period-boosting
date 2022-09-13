@@ -113,7 +113,7 @@ sys_map = Dict(
 )
 sys_names = sort([keys(sys_map)...])
 
-function create_job(sys_name::String, x0::Float, n::Int, t::Int, periods::Vector{Pair{Float, Float}}; dir="data/default", clr=false, one=nothing)
+function create_job(sys_name::String, x0::Number, n::Int64, t::Int64, periods::Vector{Tuple{Float64, Float64}}; dir="data/default", clr=false, one=nothing)
     @info "Threads: " Threads.nthreads()
 
     if !isdir(dir)
