@@ -122,7 +122,7 @@ function create_job(sys_name, x0, periods...; dir="data/default", clr=false)
 
     system = sys_map[sys_name]
 
-    n = 10
+    n = 15
     t = 100
     max_window_size = 6
     safety_margin = 1000

@@ -20,11 +20,11 @@ end
 periods = common_period(execution_times)
 path = "data/common_period_names"
 
-sys_names = ["RC"]
-x_0 = 100
+sys_names = ["CC2"]
+# x_0 = 100
 
-create_job("F1", 1, (0.028, 0.020), dir=path, clr=false)
-# create_job("CC2", 1, (0.028, 0.028), dir=path, clr=false)
+# create_job("F1", 1, (0.028, 0.020), dir=path, clr=false)
+create_job("CC2", 1, (0.028, 0.028), dir=path, clr=false)
 # create_job("CSS", 100, (0.028, 0.02), dir=path, clr=false)
 
 # Recomputed gain values
