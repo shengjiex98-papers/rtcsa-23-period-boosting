@@ -24,7 +24,7 @@ sys_names = ["CC2"]
 # x_0 = 100
 
 # create_job("F1", 1, (0.028, 0.020), dir=path, clr=false)
-create_job("CC2", 1, (0.028, 0.028), dir=path, clr=false)
+create_job("CC2", 1, 16, 100, [(0.028, 0.028)], dir=path, clr=false, one=[5, 6])
 # create_job("CSS", 100, (0.028, 0.02), dir=path, clr=false)
 
 # Recomputed gain values

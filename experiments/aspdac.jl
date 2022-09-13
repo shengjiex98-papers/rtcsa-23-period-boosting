@@ -77,3 +77,31 @@ function synthesize_full(safety_margin, bounds, model, name, strat, n, max_windo
 	@info "Synthesizing finished for" name strat (deviations, indices, time_taken)
 	(deviations, indices, time_taken)
 end
+
+function synthesize_one(safety_margin, bounds, model, name, strat, n, min_hits, window_size, t; dims=axes(model[1].A, 1), dir="data/default", clr=false)
+	@info "Synthesizing for" name strat n t
+	@info "Working on constraint: $((min_hits, window_size))..."
+
+	fullpath = "$(rstrip(dir, '/'))/$(name)_$(bounds[1])_$(min_hits)_$(window_size)_n$(n)_t$(t).csv"
+	if !clr && isfile(fullpath)
+		# @info "Full path is" fullpath
+		v, i, time_elapsed = readdlm(fullpath, ',', Float64)
+		@info "Constraint: $(constraint)... loaded from file." (v, i)
+	else
+		start = time()
+		automaton = strat(model[1], model[2], window_size-min_hits, window_size)
+		augbounds = Augment(bounds, automaton)
+		iterations = div(t+n-1, n)
+		v, i = BoundedTreeIter(automaton, augbounds, n, iterations, safety_margin, dims=dims)
+		v = round(v, sigdigits=4)
+		time_elapsed = round(time() - start, sigdigits=2)
+		# @save "data/parallel/$(name)_$(strat)_$(min_hits)_$(window_size).jld" v i time_elapsed
+		open(fullpath, "w") do file
+			writedlm(file, [v; i; time_elapsed], ',')
+		end
+		@info "Constraint: $(constraint)... done in $(round(time_elapsed, digits=2)) seconds." (v, i)
+	end
+	
+	@info "Synthesizing finished for" name strat (v, i, time_elapsed)
+	(v, i, time_elapsed)
+end

@@ -113,7 +113,7 @@ sys_map = Dict(
 )
 sys_names = sort([keys(sys_map)...])
 
-function create_job(sys_name, x0, periods...; dir="data/default", clr=false)
+function create_job(sys_name::String, x0::Float, n::Int, t::Int, periods::Vector{Pair{Float, Float}}; dir="data/default", clr=false, one=nothing)
     @info "Threads: " Threads.nthreads()
 
     if !isdir(dir)
@@ -122,8 +122,6 @@ function create_job(sys_name, x0, periods...; dir="data/default", clr=false)
 
     system = sys_map[sys_name]
 
-    n = 15
-    t = 100
     max_window_size = 6
     safety_margin = 1000
 
@@ -141,7 +139,11 @@ function create_job(sys_name, x0, periods...; dir="data/default", clr=false)
         # model = (sysd_f1, [0.293511 0.440267])
         model = (c2d(system, hs[1]), delay_lqr(system, hs[2]))
         
-        synthesize_full(safety_margin, bounds, model, sys_name, strat, n, max_window_size, t; dims=[2], dir=subdir, clr=clr)
+        if one === nothing
+            synthesize_full(safety_margin, bounds, model, sys_name, strat, n, max_window_size, t; dims=[2], dir=subdir, clr=clr)
+        else
+            synthesize_one(safety_margin, bounds, model, sys_name, strat, n, one[1], one[2], t; dims=[2], dir=subdir, clr=clr)
+        end
     end
 
     @info "Experiment finished."
