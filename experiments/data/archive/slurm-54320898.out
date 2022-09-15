@@ -1,0 +1,30 @@
+ERROR: SystemError: close: Stale file handle
+Stacktrace:
+  [1] systemerror(p::String, errno::Int32; extrainfo::Nothing)
+    @ Base ./error.jl:168
+  [2] #systemerror#62
+    @ ./error.jl:167 [inlined]
+  [3] systemerror
+    @ ./error.jl:167 [inlined]
+  [4] close
+    @ ./iostream.jl:63 [inlined]
+  [5] open(::Pkg.API.var"#248#249"{Vector{Pkg.Types.PackageSpec}}, ::String, ::Vararg{String, N} where N; kwargs::Base.Iterators.Pairs{Union{}, Union{}, Tuple{}, NamedTuple{(), Tuple{}}})
+    @ Base ./io.jl:332
+  [6] open
+    @ ./io.jl:328 [inlined]
+  [7] save_precompile_state()
+    @ Pkg.API /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.6/Pkg/src/API.jl:1279
+  [8] precompile(ctx::Pkg.Types.Context; internal_call::Bool, strict::Bool, kwargs::Base.Iterators.Pairs{Union{}, Union{}, Tuple{}, NamedTuple{(), Tuple{}}})
+    @ Pkg.API /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.6/Pkg/src/API.jl:1210
+  [9] _auto_precompile(ctx::Pkg.Types.Context)
+    @ Pkg /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.6/Pkg/src/Pkg.jl:596
+ [10] instantiate(ctx::Pkg.Types.Context; manifest::Nothing, update_registry::Bool, verbose::Bool, platform::Base.BinaryPlatforms.Platform, allow_build::Bool, allow_autoprecomp::Bool, kwargs::Base.Iterators.Pairs{Union{}, Union{}, Tuple{}, NamedTuple{(), Tuple{}}})
+    @ Pkg.API /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.6/Pkg/src/API.jl:1359
+ [11] instantiate
+    @ /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.6/Pkg/src/API.jl:1325 [inlined]
+ [12] #instantiate#252
+    @ /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.6/Pkg/src/API.jl:1321 [inlined]
+ [13] instantiate()
+    @ Pkg.API /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.6/Pkg/src/API.jl:1321
+ [14] top-level scope
+    @ none:1

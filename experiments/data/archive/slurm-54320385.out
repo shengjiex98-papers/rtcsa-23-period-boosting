@@ -1,0 +1,19 @@
+[ Info: Included as module
+┌ Info: Threads: 
+└   Threads.nthreads() = 1
+┌ Info: Period is
+│   hs[1] = 0.02
+└   hs[2] = 0.02
+┌ Info: Synthesizing for
+│   name = "CC2"
+│   strat = HoldAndKill (generic function with 3 methods)
+│   n = 20
+└   t = 100
+[ Info: Working on constraint: (5, 6)...
+┌ Info: Constraint: (5, 6)... done in 25.0 seconds.
+└   (v, i) = (0.02822, 97)
+┌ Info: Synthesizing finished for
+│   name = "CC2"
+│   strat = HoldAndKill (generic function with 3 methods)
+└   (v, i, time_elapsed) = (0.02822, 97, 25.0)
+[ Info: Experiment finished.

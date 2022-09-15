@@ -1,0 +1,31 @@
+[ Info: Included as module
+┌ Info: Threads: 
+└   Threads.nthreads() = 1
+┌ Info: Period is
+│   hs[1] = 0.028
+└   hs[2] = 0.028
+┌ Info: Synthesizing for
+│   name = "CC2"
+│   strat = HoldAndKill (generic function with 3 methods)
+│   n = 20
+└   t = 100
+┌ Info: System matrices and K:
+│   (model[1]).A =
+│    4×4 Matrix{Float64}:
+│     0.999978  0.0279805  0.000390995  9.04446e-6
+│     ⋮                                 
+│   (model[1]).B =
+│    4×1 Matrix{Float64}:
+│     0.0
+│     ⋮
+│   model[2] =
+│    1×4 Matrix{Float64}:
+└     143.805  58.5152  9.27314  0.589163
+[ Info: Working on constraint: (5, 6)...
+┌ Info: Constraint: (5, 6)... done in 32.0 seconds.
+└   (v, i) = (0.905, 7)
+┌ Info: Synthesizing finished for
+│   name = "CC2"
+│   strat = HoldAndKill (generic function with 3 methods)
+└   (v, i, time_elapsed) = (0.905, 7, 32.0)
+[ Info: Experiment finished.

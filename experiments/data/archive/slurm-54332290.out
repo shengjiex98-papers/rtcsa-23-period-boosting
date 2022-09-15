@@ -1,0 +1,61 @@
+[ Info: Included as module
+┌ Info: Threads: 
+└   Threads.nthreads() = 8
+┌ Info: Period is
+│   hs[1] = 0.015
+└   hs[2] = 0.015
+┌ Info: Synthesizing for
+│   name = "CSS"
+│   strat = HoldAndKill (generic function with 3 methods)
+│   n = 15
+└   t = 100
+[ Info: Working on constraint: (1, 2)...
+[ Info: Working on constraint: (2, 3)...
+[ Info: Working on constraint: (1, 6)...
+[ Info: Working on constraint: (1, 5)...
+[ Info: Working on constraint: (3, 6)...
+[ Info: Working on constraint: (5, 6)...
+[ Info: Working on constraint: (2, 4)...
+[ Info: Working on constraint: (3, 5)...
+┌ Info: Constraint: (5, 6)... done in 28.0 seconds.
+└   (v, i) = (0.05389, 3)
+┌ Info: Constraint: (2, 3)... done in 38.0 seconds.
+└   (v, i) = (0.05389, 3)
+[ Info: Working on constraint: (1, 4)...
+┌ Info: Constraint: (1, 2)... done in 78.0 seconds.
+└   (v, i) = (0.05389, 3)
+[ Info: Working on constraint: (1, 3)...
+┌ Info: Constraint: (3, 5)... done in 320.0 seconds.
+└   (v, i) = (0.06779, 4)
+[ Info: Working on constraint: (4, 5)...
+┌ Info: Constraint: (4, 5)... done in 7.9 seconds.
+└   (v, i) = (0.05389, 3)
+┌ Info: Constraint: (2, 4)... done in 510.0 seconds.
+└   (v, i) = (0.06779, 4)
+[ Info: Working on constraint: (3, 4)...
+┌ Info: Constraint: (3, 4)... done in 11.0 seconds.
+└   (v, i) = (0.05389, 3)
+┌ Info: Constraint: (1, 3)... done in 680.0 seconds.
+└   (v, i) = (0.06779, 4)
+┌ Info: Constraint: (3, 6)... done in 1900.0 seconds.
+└   (v, i) = (0.07483, 5)
+[ Info: Working on constraint: (4, 6)...
+┌ Info: Constraint: (4, 6)... done in 130.0 seconds.
+└   (v, i) = (0.06779, 4)
+┌ Info: Constraint: (1, 4)... done in 2100.0 seconds.
+└   (v, i) = (0.07483, 5)
+┌ Info: Constraint: (1, 5)... done in 4600.0 seconds.
+└   (v, i) = (0.1238, 99)
+[ Info: Working on constraint: (2, 5)...
+┌ Info: Constraint: (2, 5)... done in 1100.0 seconds.
+└   (v, i) = (0.07483, 5)
+┌ Info: Constraint: (1, 6)... done in 8600.0 seconds.
+└   (v, i) = (0.1529, 100)
+[ Info: Working on constraint: (2, 6)...
+┌ Info: Constraint: (2, 6)... done in 3700.0 seconds.
+└   (v, i) = (0.07906, 6)
+┌ Info: Synthesizing finished for
+│   name = "CSS"
+│   strat = HoldAndKill (generic function with 3 methods)
+└   (deviations, indices, time_taken) = ([0.05389 NaN … NaN NaN; 0.06779 0.05389 … NaN NaN; … ; 0.1238 0.07483 … 0.05389 NaN; 0.1529 0.07906 … 0.06779 0.05389], [3 -1 … -1 -1; 4 3 … -1 -1; … ; 99 5 … 3 -1; 100 6 … 4 3], [78.0 NaN … NaN NaN; 680.0 38.0 … NaN NaN; … ; 4600.0 1100.0 … 7.9 NaN; 8600.0 3700.0 … 130.0 28.0])
+[ Info: Experiment finished.

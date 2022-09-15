@@ -1,0 +1,4 @@
+ERROR: syntax: incomplete: premature end of input
+Stacktrace:
+ [1] top-level scope
+   @ none:1
