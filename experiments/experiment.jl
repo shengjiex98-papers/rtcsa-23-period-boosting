@@ -86,11 +86,14 @@ end
 
 h = 0.02
 
-delay_lqr(sys, h) = let
-    Q = I
-    R = I
+delay_lqr(sys, h, Q=I, R=I) = let
     sysd_delay = c2da(sys, h, h)
     lqr(sysd_delay, Q, R)
+end
+
+pole_place(sys, h, p=0.75) = let
+    sysd_delay = c2da(sys, h, h)
+    place(sysd_delay, vcat([0], fill(0.8, size(sys.A)[1])))
 end
 
 # sys_map = Dict(
@@ -113,7 +116,7 @@ sys_map = Dict(
 )
 sys_names = sort([keys(sys_map)...])
 
-function create_job(sys_name::String, x0::Number, n::Int64, t::Int64, periods::Vector{Tuple{Float64, Float64}}; dir="data/default", clr=false, one=nothing)
+function create_job(sys_name::String, x0::Number, n::Int64, t::Int64, periods::Vector{Tuple{Float64, Float64}}; dir="data/default", clr=false, one=nothing, ctrl=delay_lqr)
     @info "Threads: " Threads.nthreads()
 
     if !isdir(dir)
@@ -137,7 +140,7 @@ function create_job(sys_name::String, x0::Number, n::Int64, t::Int64, periods::V
 
         strat = HoldAndKill
         # model = (sysd_f1, [0.293511 0.440267])
-        model = (c2d(system, hs[1]), delay_lqr(system, hs[2]))
+        model = (c2da(system, hs[1], hs[1]), ctrl(system, hs[2]))
         
         if one === nothing
             synthesize_full(safety_margin, bounds, model, sys_name, strat, n, max_window_size, t; dims=[2], dir=subdir, clr=clr)
