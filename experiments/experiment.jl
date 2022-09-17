@@ -91,9 +91,9 @@ delay_lqr(sys, h, Q=I, R=I) = let
     lqr(sysd_delay, Q, R)
 end
 
-pole_place(sys, h, p=0.75) = let
+pole_place(sys, h, p=0.9) = let
     sysd_delay = c2da(sys, h, h)
-    place(sysd_delay, vcat([0], fill(0.8, size(sys.A)[1])))
+    place(sysd_delay, vcat([0], fill(p, size(sys.A)[1])))
 end
 
 # sys_map = Dict(
@@ -116,7 +116,9 @@ sys_map = Dict(
 )
 sys_names = sort([keys(sys_map)...])
 
-function create_job(sys_name::String, x0::Number, n::Int64, t::Int64, periods::Vector{Tuple{Float64, Float64}}; dir="data/default", clr=false, one=nothing, ctrl=delay_lqr)
+function create_job(
+    sys_name::String, x0::Number, n::Int64, t::Int64, hs::Tuple{Float64, Float64}; 
+    dir::String="data/default", clr::Bool=false, one::Union{Nothing, Tuple{Int64, Int64}}=nothing, ctrl::String="delay_lqr", ctrl_args=())
     @info "Threads: " Threads.nthreads()
 
     if !isdir(dir)
@@ -131,22 +133,21 @@ function create_job(sys_name::String, x0::Number, n::Int64, t::Int64, periods::V
     q = size(system.A, 1)
     bounds = repeat([x0 x0], q)
 
-    for hs in periods
-        @info "Period is" hs[1] hs[2]
-        subdir = "$(rstrip(dir, '/'))/$(hs[1])s_$(hs[2])s"
-        if !isdir(subdir)
-            mkdir(subdir)
-        end
+    @info "Period is" hs[1] hs[2]
+    subdir = "$(rstrip(dir, '/'))/$(hs[1])s_$(hs[2])s"
+    if !isdir(subdir)
+        mkdir(subdir)
+    end
 
-        strat = HoldAndKill
-        # model = (sysd_f1, [0.293511 0.440267])
-        model = (c2da(system, hs[1], hs[1]), ctrl(system, hs[2]))
-        
-        if one === nothing
-            synthesize_full(safety_margin, bounds, model, sys_name, strat, n, max_window_size, t; dims=[2], dir=subdir, clr=clr)
-        else
-            synthesize_one(safety_margin, bounds, model, sys_name, strat, n, one[1], one[2], t; dims=[2], dir=subdir, clr=clr)
-        end
+    @info "Using controller design method" ctrl
+    strat = HoldAndKill
+    ctrl_design = if ctrl == "delay_lqr" delay_lqr else pole_place end
+    model = (c2da(system, hs[1], hs[1]), ctrl_design(system, hs[2], ctrl_args...))
+    
+    if one === nothing
+        synthesize_full(safety_margin, bounds, model, sys_name, strat, n, max_window_size, t; dims=[2], dir=subdir, clr=clr)
+    else
+        synthesize_one(safety_margin, bounds, model, sys_name, strat, n, one[1], one[2], t; dims=[2], dir=subdir, clr=clr)
     end
 
     @info "Experiment finished."
