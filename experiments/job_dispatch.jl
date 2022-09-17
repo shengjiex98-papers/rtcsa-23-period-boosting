@@ -10,11 +10,11 @@ execution_times = Dict(
 )
 
 systems = [
-    Dict([("name", "RC"), ("x0", 100), ("n", 10), ("p", 0.023), ("ctrl", delay_lqr)]),
-    # Dict([("name", "F1"), ("x0", 1), ("n", 16), ("p", 0.020), ("ctrl", delay_lqr)]),
-    Dict([("name", "DCM"), ("x0", 100), ("n", 10), ("p", 0.023), ("ctrl", delay_lqr)]),
-    # Dict([("name", "CSS"), ("x0", 100), ("n", 16), ("p", 0.027), ("ctrl", delay_lqr)]),
-    # Dict([("name", "CC2"), ("x0", 1), ("n", 20), ("p", 0.028), ("ctrl", pole_place)])
+    Dict([("name", "RC"), ("x0", 100), ("n", 10), ("p", 0.023), ("ctrl", "delay_lqr")]),
+    Dict([("name", "F1"), ("x0", 1), ("n", 16), ("p", 0.020), ("ctrl", "delay_lqr")]),
+    Dict([("name", "DCM"), ("x0", 100), ("n", 10), ("p", 0.023), ("ctrl", "delay_lqr")]),
+    Dict([("name", "CSS"), ("x0", 100), ("n", 16), ("p", 0.027), ("ctrl", "delay_lqr")]),
+    Dict([("name", "CC2"), ("x0", 1), ("n", 20), ("p", 0.028), ("ctrl", "pole_place")])
 ]
 
 # function common_period(execution_times, num_controllers)
@@ -29,16 +29,16 @@ end
 path = "data/finalize"
 date_periods = [0.015, 0.028, 0.040]
 
-# Each system, independently
-for sys in systems
-    create_job(sys["name"], sys["x0"], sys["n"], 100, (sys["p"], sys["p"]); dir=path, clr=true, ctrl=sys["ctrl"])
-end
+# # Each system, independently
+# for sys in systems
+#     create_job(sys["name"], sys["x0"], sys["n"], 100, (sys["p"], sys["p"]); dir=path, clr=true, ctrl=sys["ctrl"])
+# end
 
-# Each system, using each common period
-for sys in systems, period in date_periods
-    create_job(sys["name"], sys["x0"], sys["n"], 100, (period, sys["p"]); dir=path, clr=true, ctrl=sys["ctrl"])
-    create_job(sys["name"], sys["x0"], sys["n"], 100, (period, period); dir=path, clr=true, ctrl=sys["ctrl"])
-end
+# # Each system, using each common period
+# for sys in systems, period in date_periods
+#     create_job(sys["name"], sys["x0"], sys["n"], 100, (period, sys["p"]); dir=path, clr=true, ctrl=sys["ctrl"])
+#     create_job(sys["name"], sys["x0"], sys["n"], 100, (period, period); dir=path, clr=true, ctrl=sys["ctrl"])
+# end
 
 # sys_names = ["CC2"]
 # x_0 = 100
