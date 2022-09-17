@@ -1149,7 +1149,7 @@ end
 
 # ╔═╡ eb79be36-73ba-423d-9d77-a42ab4007246
 function corners_from_bounds(bounds; cycle=false, dims=nothing)
-	if dims == nothing
+	if dims === nothing
 		dims = axes(bounds, 1)
 	end
 	ldims = length(dims)
@@ -1221,12 +1221,12 @@ end
 
 # ╔═╡ 728953ad-b271-4ac0-bdc7-e8c71597b092
 function deviation(automaton, bounds, reachable; dims=axes(bounds,1), metric=Euclidean(), nominal=repeat([2],size(reachable,1)-1))
-	if nominal == nothing
+	if nominal === nothing
 		# Assume a nominal behavior of all hits
 		nominal = ones(Int64, size(reachable, 1) - 1) .+ 1
 	end
 	
-	if dims == nothing
+	if dims === nothing
 		# Assume dimensions 1 and 2 are the plant state
 		# TODO: this is mostly just hardcoded for now, ignoring the dims variable.
 		#   Partially the fault of corners_from_bounds.
