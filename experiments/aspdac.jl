@@ -79,8 +79,9 @@ function synthesize_full(safety_margin, bounds, model, name, strat, n, max_windo
 end
 
 function synthesize_one(safety_margin, bounds, model, name, strat, n, min_hits, window_size, t; dims=axes(model[1].A, 1), dir="data/default", clr=false)
-	@info "Synthesizing for" name strat n t
-	@info "System matrices and K:" model[1].A model[1].B model[2]
+	@info "Synthesizing for" name strat n t x_0=bounds[1][1]
+	@info "System matrices and K" A=model[1].A B=model[1].B K=model[2]
+	@info "Poles are" poles=round.(abs.(eigvals(model[1].A - model[1].B*model[2])), digits=2)'
 	@info "Working on constraint: $((min_hits, window_size))..."
 
 	fullpath = "$(rstrip(dir, '/'))/$(name)_$(bounds[1])_$(min_hits)_$(window_size)_n$(n)_t$(t).csv"
