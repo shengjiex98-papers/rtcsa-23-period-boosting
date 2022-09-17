@@ -153,6 +153,30 @@ function create_job(
     @info "Experiment finished."
 end
 
+function maketable(dir, name, x0, n, t, max_window_size=6)
+	deviations = fill(NaN, (max_window_size-1, max_window_size-1))
+    indices    = fill(-1,  (max_window_size-1, max_window_size-1))
+	time_taken = fill(NaN, (max_window_size-1, max_window_size-1))
+
+    for window_size in 2:max_window_size, min_hits in 1:window_size-1
+        fullpath = "$(rstrip(dir, '/'))/$(name)_$(x0)_$(min_hits)_$(window_size)_n$(n)_t$(t).csv"
+        if isfile(fullpath)
+            v, i, time_elapsed = readdlm(fullpath, ',', Float64)
+            @info "Constraint: ($min_hits, $window_size)... loaded from file." (v, i)
+        else
+            v, i, time_elapsed = (1234.56, 103, 65.4321)
+            @info "Constraint: ($min_hits, $window_size)... not available"
+        end
+		deviations[window_size-1, min_hits] = v
+		indices[window_size-1, min_hits]    = i
+		time_taken[window_size-1, min_hits] = time_elapsed
+    end
+	fullpath = "$(rstrip(dir, '/'))/$(name)_$(x0)_n$(n)_t$(t).csv"
+	open(fullpath, "w") do file
+		writedlm(file, [deviations; indices; time_taken], ',')
+	end
+end
+
 if abspath(PROGRAM_FILE) == @__FILE__
     @info "Running as main"
     # create_job(ARGS[1], ARGS[2:end]...)

@@ -62,32 +62,27 @@ function summer(path, threshold_percent; sigdigits=2)
 end
 
 # ╔═╡ acb69bf3-7f44-4e49-9e04-619e455db184
-function compare_gain(path1, path2, threshold_percent)
+function compare_gain(path1, path2, path3, threshold_percent)
 	dev1, ind1, w = getdev(path1, sigdigits=3)
 	dev2, ind2, w = getdev(path2, sigdigits=3)
+	dev3, ind3, w = getdev(path3, sigdigits=3)
 
-	min_v = minimum(x -> isnan(x) ? Inf  : x, vcat(dev1, dev2))
-	max_v = maximum(x -> isnan(x) ? -Inf : x, vcat(dev1, dev2))
-	threshold = min_v + (max_v - min_v) * threshold_percent
+	min_v = minimum(x -> isnan(x) ? Inf  : x, vcat(dev1, dev2, dev3))
+	max_v = maximum(x -> isnan(x) ? -Inf : x, vcat(dev1, dev2, dev3))
+	threshold = min_v + (min(max_v, 1000) - min_v) * threshold_percent
 	
-	to_show = fill(' ', (w, w))
+	to_show = fill("   ", (w, w))
 
 	min_hits = 1
 	for window_size in 2:w+1
 		for min_hits in 1:window_size-1
-			d1 = dev1[window_size-1, min_hits]
-			d2 = dev2[window_size-1, min_hits]
-			if d1 <= threshold && d2 <= threshold
-				sy = 's'
-			elseif d1 > threshold && d2 > threshold
-				sy = 'x'
-			elseif d1 <= threshold && d2 > threshold
-				sy = '1'
-			elseif d1 > threshold && d2 <= threshold
-				sy = '2'
-			else
-				sy = '?'
-			end
+			d1, i1 = dev1[window_size-1, min_hits], ind1[window_size-1, min_hits]
+			d2, i2 = dev2[window_size-1, min_hits], ind2[window_size-1, min_hits]
+			d3, i3 = dev3[window_size-1, min_hits], ind3[window_size-1, min_hits]
+			sy = ""
+			sy *= if d1 <= threshold && i1 <= 80 "1" else " " end
+			sy *= if d2 <= threshold && i2 <= 80 "2" else " " end
+			sy *= if d3 <= threshold && i3 <= 80 "3" else " " end
 			to_show[window_size-1, min_hits] = sy
 			# min_hits += 1
 		end
@@ -100,15 +95,66 @@ function compare_gain(path1, path2, threshold_percent)
 	to_show
 end
 
+# ╔═╡ 2b524bb2-0e93-4550-b806-ce4bcfc7d6a9
+systems = [
+    Dict([("name", "RC"), ("x0", 100), ("n", 10), ("p", 0.023), ("ctrl", "delay_lqr"), ("ctrl_args", ())]),
+    Dict([("name", "F1"), ("x0", 1), ("n", 16), ("p", 0.020), ("ctrl", "delay_lqr"), ("ctrl_args", ())]),
+    Dict([("name", "DCM"), ("x0", 100), ("n", 10), ("p", 0.023), ("ctrl", "delay_lqr"), ("ctrl_args", ())]),
+    Dict([("name", "CSS"), ("x0", 100), ("n", 15), ("p", 0.027), ("ctrl", "delay_lqr"), ("ctrl_args", ())]),
+    Dict([("name", "CC2"), ("x0", 1), ("n", 20), ("p", 0.028), ("ctrl", "pole_place"), ("ctrl_args", (0.85))])
+]
+
 # ╔═╡ 5f80af0d-d220-4f22-8507-c8dae4335433
 @bind RC Slider(0:0.01:1, show_value=true)
 
 # ╔═╡ 6bb79ca7-2dc1-4ce8-aceb-621356a96bca
-let
-	path1 = "./data/finalize/0.015s_0.015s/DCM_100_n10_t100.csv"
-	path2 = "./data/finalize/0.015s_0.023s/DCM_100_n10_t100.csv"
-	compare_gain(path1, path2, RC)
+function compare_sys(path, sys, threshold, p1, p2)
+	path1 = "$path/$(p1)s_$(sys["p"])s/"
+	path2 = "$path/$(p2)s_$(sys["p"])s/"
+	path3 = "$path/$(p1)s_$(p1)s/"
+	filename = "$(sys["name"])_$(sys["x0"])_n$(sys["n"])_t100.csv"
+	compare_gain(path1*filename, path2*filename, path3*filename, threshold)
 end
+
+# ╔═╡ 56afdb38-7c45-4b95-9f6a-04c958d7aa89
+begin
+	p1 = 0.04
+	p2 = 0.028
+end
+
+# ╔═╡ 0c1086a3-207a-4ed7-b23c-6bf2e739d5fb
+# let
+# 	path1 = "./data/finalize/0.04s_0.023s/"
+# 	path2 = "./data/finalize/0.028s_0.023s/"
+# 	path3 = "./data/finalize/0.04s_0.04s/"
+# 	filename = "RC_100_n10_t100.csv"
+# 	compare_gain(path1*filename, path2*filename, path3*filename, RC)
+# end
+compare_sys("./data/finalize", systems[1], RC, p1, p2)
+
+# ╔═╡ 7a3cc4ad-13ce-4705-ae51-b4782559e1aa
+@bind F1 Slider(0:0.01:1, show_value=true)
+
+# ╔═╡ d9346519-644a-4202-8eda-e7c6c61eb521
+compare_sys("./data/finalize", systems[2], F1, p1, p2)
+
+# ╔═╡ dcb995fa-c965-437e-940a-5c9e81e8146e
+@bind DCM Slider(0:0.01:1, show_value=true)
+
+# ╔═╡ ae0afed6-62fb-4a61-888f-48b35d23963d
+compare_sys("./data/finalize", systems[3], DCM, p1, p2)
+
+# ╔═╡ 631abc54-e942-421f-b092-2e16da2a302f
+@bind CSS Slider(0:0.01:1, show_value=true)
+
+# ╔═╡ 5643cba7-c8da-41c4-99c8-88b1c02f1ad9
+compare_sys("./data/ccs_lqr", systems[4], CSS, p1, p2)
+
+# ╔═╡ c77f94d1-c00d-4710-846f-9887d104afd0
+@bind CC2 Slider(0:0.01:1, show_value=true)
+
+# ╔═╡ 8a9389b5-fdc5-4af9-be71-f3a28bad121e
+compare_sys("./data/cc2_0.9pole", systems[5], CC2, p1, p2)
 
 # ╔═╡ 66731c94-e83e-414c-80eb-b37d8ef69724
 md"""
@@ -497,8 +543,19 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╠═d6708b2d-0ccd-472b-b994-a175b5960d29
 # ╠═e2a0c124-bf14-4fbc-bddb-959d1220581b
 # ╠═acb69bf3-7f44-4e49-9e04-619e455db184
+# ╠═2b524bb2-0e93-4550-b806-ce4bcfc7d6a9
 # ╠═5f80af0d-d220-4f22-8507-c8dae4335433
 # ╠═6bb79ca7-2dc1-4ce8-aceb-621356a96bca
+# ╠═56afdb38-7c45-4b95-9f6a-04c958d7aa89
+# ╠═0c1086a3-207a-4ed7-b23c-6bf2e739d5fb
+# ╠═7a3cc4ad-13ce-4705-ae51-b4782559e1aa
+# ╠═d9346519-644a-4202-8eda-e7c6c61eb521
+# ╠═dcb995fa-c965-437e-940a-5c9e81e8146e
+# ╠═ae0afed6-62fb-4a61-888f-48b35d23963d
+# ╠═631abc54-e942-421f-b092-2e16da2a302f
+# ╠═5643cba7-c8da-41c4-99c8-88b1c02f1ad9
+# ╠═c77f94d1-c00d-4710-846f-9887d104afd0
+# ╠═8a9389b5-fdc5-4af9-be71-f3a28bad121e
 # ╟─1406c32e-ce99-4de6-aa29-1d8ee2cf7744
 # ╠═9b273a22-552e-4b35-974e-7675aebf5fa4
 # ╠═66731c94-e83e-414c-80eb-b37d8ef69724
