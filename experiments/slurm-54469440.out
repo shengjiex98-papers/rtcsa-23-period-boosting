@@ -1,0 +1,38 @@
+[ Info: Included as module
+┌ Info: Threads: 
+└   Threads.nthreads() = 1
+┌ Info: Period is
+│   hs[1] = 0.028
+└   hs[2] = 0.027
+┌ Info: Using controller design method
+└   ctrl = "delay_lqr"
+┌ Info: Synthesizing for
+│   name = "CSS"
+│   strat = HoldAndKill (generic function with 3 methods)
+│   n = 15
+│   t = 100
+└   x_0 = 100
+┌ Info: System matrices and K
+│   A =
+│    5×5 Matrix{Float64}:
+│     0.997751  0.0268528  0.00145417  0.000942465  0.0196443
+│     ⋮                                             
+│   B =
+│    5×1 Matrix{Float64}:
+│     0.0
+│     ⋮
+│   K =
+│    1×5 Matrix{Float64}:
+└     -0.0609789  -0.0296375  0.156903  -0.0019465  0.197149
+┌ Info: Poles are
+│   poles =
+│    1×5 adjoint(::Vector{Float64}) with eltype Float64:
+└     0.05  0.05  0.93  0.98  0.98
+[ Info: Working on constraint: (1, 4)...
+┌ Info: Constraint: (1, 4)... done in 4300.0 seconds.
+└   (v, i) = (9.402, 5)
+┌ Info: Synthesizing finished for
+│   name = "CSS"
+│   strat = HoldAndKill (generic function with 3 methods)
+└   (v, i, time_elapsed) = (9.402, 5, 4300.0)
+[ Info: Experiment finished.

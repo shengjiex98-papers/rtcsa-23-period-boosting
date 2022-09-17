@@ -1,0 +1,38 @@
+[ Info: Included as module
+┌ Info: Threads: 
+└   Threads.nthreads() = 1
+┌ Info: Period is
+│   hs[1] = 0.015
+└   hs[2] = 0.015
+┌ Info: Using controller design method
+└   ctrl = "pole_place"
+┌ Info: Synthesizing for
+│   name = "CC2"
+│   strat = HoldAndKill (generic function with 3 methods)
+│   n = 20
+│   t = 100
+└   x_0 = 1
+┌ Info: System matrices and K
+│   A =
+│    4×4 Matrix{Float64}:
+│     0.999997  0.014997  0.000112355  1.39182e-6
+│     ⋮                                
+│   B =
+│    4×1 Matrix{Float64}:
+│     0.0
+│     ⋮
+│   K =
+│    1×4 Matrix{Float64}:
+└     116.696  51.1124  8.31328  0.295239
+┌ Info: Poles are
+│   poles =
+│    1×4 adjoint(::Vector{Float64}) with eltype Float64:
+└     0.0  0.9  0.9  0.9
+[ Info: Working on constraint: (1, 3)...
+┌ Info: Constraint: (1, 3)... done in 7100.0 seconds.
+└   (v, i) = (0.9457, 88)
+┌ Info: Synthesizing finished for
+│   name = "CC2"
+│   strat = HoldAndKill (generic function with 3 methods)
+└   (v, i, time_elapsed) = (0.9457, 88, 7100.0)
+[ Info: Experiment finished.

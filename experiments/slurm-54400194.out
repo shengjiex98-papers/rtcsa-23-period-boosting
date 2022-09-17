@@ -1,0 +1,422 @@
+[ Info: Included as module
+[ Info: Set([0.025, 0.022, 0.023, 0.027, 0.02, 0.028])
+┌ Info: Threads: 
+└   Threads.nthreads() = 8
+┌ Info: Period is
+│   hs[1] = 0.02
+└   hs[2] = 0.02
+┌ Info: Synthesizing for
+│   name = "F1"
+│   strat = HoldAndKill (generic function with 3 methods)
+│   n = 16
+└   t = 100
+[ Info: Working on constraint: (3, 6)...
+[ Info: Working on constraint: (5, 6)...
+[ Info: Working on constraint: (2, 3)...
+[ Info: Working on constraint: (3, 5)...
+[ Info: Working on constraint: (2, 4)...
+[ Info: Working on constraint: (1, 2)...
+[ Info: Working on constraint: (1, 5)...
+[ Info: Working on constraint: (1, 6)...
+┌ Info: Constraint: (5, 6)... done in 32.0 seconds.
+└   (v, i) = (0.5945, 4)
+┌ Info: Constraint: (2, 3)... done in 40.0 seconds.
+└   (v, i) = (0.5945, 4)
+[ Info: Working on constraint: (1, 4)...
+┌ Info: Constraint: (1, 2)... done in 74.0 seconds.
+└   (v, i) = (0.5945, 4)
+[ Info: Working on constraint: (1, 3)...
+┌ Info: Constraint: (3, 5)... done in 320.0 seconds.
+└   (v, i) = (1.219, 5)
+[ Info: Working on constraint: (4, 5)...
+┌ Info: Constraint: (4, 5)... done in 6.4 seconds.
+└   (v, i) = (0.5945, 4)
+┌ Info: Constraint: (2, 4)... done in 480.0 seconds.
+└   (v, i) = (1.219, 5)
+[ Info: Working on constraint: (3, 4)...
+┌ Info: Constraint: (3, 4)... done in 8.4 seconds.
+└   (v, i) = (0.5945, 4)
+┌ Info: Constraint: (1, 3)... done in 770.0 seconds.
+└   (v, i) = (1.219, 5)
+┌ Info: Constraint: (3, 6)... done in 2300.0 seconds.
+└   (v, i) = (2.842, 108)
+[ Info: Working on constraint: (4, 6)...
+┌ Info: Constraint: (4, 6)... done in 180.0 seconds.
+└   (v, i) = (1.219, 5)
+┌ Info: Constraint: (1, 4)... done in 2900.0 seconds.
+└   (v, i) = (13.98, 108)
+┌ Info: Constraint: (1, 5)... done in 6400.0 seconds.
+└   (v, i) = (1741.0, 109)
+[ Info: Working on constraint: (2, 5)...
+┌ Info: Constraint: (2, 5)... done in 1900.0 seconds.
+└   (v, i) = (3.669, 108)
+┌ Info: Constraint: (1, 6)... done in 10000.0 seconds.
+└   (v, i) = (5102.0, 79)
+[ Info: Working on constraint: (2, 6)...
+┌ Info: Constraint: (2, 6)... done in 6700.0 seconds.
+└   (v, i) = (833.5, 109)
+┌ Info: Synthesizing finished for
+│   name = "F1"
+│   strat = HoldAndKill (generic function with 3 methods)
+└   (deviations, indices, time_taken) = ([0.5945 NaN … NaN NaN; 1.219 0.5945 … NaN NaN; … ; 1741.0 3.669 … 0.5945 NaN; 5102.0 833.5 … 1.219 0.5945], [4 -1 … -1 -1; 5 4 … -1 -1; … ; 109 108 … 4 -1; 79 109 … 5 4], [74.0 NaN … NaN NaN; 770.0 40.0 … NaN NaN; … ; 6400.0 1900.0 … 6.4 NaN; 10000.0 6700.0 … 180.0 32.0])
+[ Info: Experiment finished.
+┌ Info: Threads: 
+└   Threads.nthreads() = 8
+┌ Info: Period is
+│   hs[1] = 0.015
+└   hs[2] = 0.02
+┌ Info: Synthesizing for
+│   name = "F1"
+│   strat = HoldAndKill (generic function with 3 methods)
+│   n = 16
+└   t = 100
+[ Info: Working on constraint: (1, 6)...
+[ Info: Working on constraint: (2, 4)...
+[ Info: Working on constraint: (2, 3)...
+[ Info: Working on constraint: (1, 5)...
+[ Info: Working on constraint: (1, 2)...
+[ Info: Working on constraint: (3, 6)...
+[ Info: Working on constraint: (5, 6)...
+[ Info: Working on constraint: (3, 5)...
+┌ Info: Constraint: (5, 6)... done in 8.0 seconds.
+└   (v, i) = (0.4459, 5)
+┌ Info: Constraint: (2, 3)... done in 13.0 seconds.
+└   (v, i) = (0.4459, 5)
+[ Info: Working on constraint: (1, 4)...
+┌ Info: Constraint: (1, 2)... done in 55.0 seconds.
+└   (v, i) = (0.4459, 5)
+[ Info: Working on constraint: (1, 3)...
+┌ Info: Constraint: (3, 5)... done in 330.0 seconds.
+└   (v, i) = (0.9086, 5)
+[ Info: Working on constraint: (4, 5)...
+┌ Info: Constraint: (4, 5)... done in 8.9 seconds.
+└   (v, i) = (0.4459, 5)
+┌ Info: Constraint: (2, 4)... done in 470.0 seconds.
+└   (v, i) = (0.9086, 5)
+[ Info: Working on constraint: (3, 4)...
+┌ Info: Constraint: (3, 4)... done in 8.7 seconds.
+└   (v, i) = (0.4459, 5)
+┌ Info: Constraint: (1, 3)... done in 800.0 seconds.
+└   (v, i) = (0.9086, 5)
+┌ Info: Constraint: (3, 6)... done in 2300.0 seconds.
+└   (v, i) = (1.232, 6)
+[ Info: Working on constraint: (4, 6)...
+┌ Info: Constraint: (4, 6)... done in 170.0 seconds.
+└   (v, i) = (0.9086, 5)
+┌ Info: Constraint: (1, 4)... done in 2900.0 seconds.
+└   (v, i) = (2.424, 107)
+┌ Info: Constraint: (1, 5)... done in 6700.0 seconds.
+└   (v, i) = (38.66, 109)
+[ Info: Working on constraint: (2, 5)...
+┌ Info: Constraint: (2, 5)... done in 2000.0 seconds.
+└   (v, i) = (1.232, 6)
+┌ Info: Constraint: (1, 6)... done in 13000.0 seconds.
+└   (v, i) = (1171.0, 111)
+[ Info: Working on constraint: (2, 6)...
+┌ Info: Constraint: (2, 6)... done in 6400.0 seconds.
+└   (v, i) = (13.04, 109)
+┌ Info: Synthesizing finished for
+│   name = "F1"
+│   strat = HoldAndKill (generic function with 3 methods)
+└   (deviations, indices, time_taken) = ([0.4459 NaN … NaN NaN; 0.9086 0.4459 … NaN NaN; … ; 38.66 1.232 … 0.4459 NaN; 1171.0 13.04 … 0.9086 0.4459], [5 -1 … -1 -1; 5 5 … -1 -1; … ; 109 6 … 5 -1; 111 109 … 5 5], [55.0 NaN … NaN NaN; 800.0 13.0 … NaN NaN; … ; 6700.0 2000.0 … 8.9 NaN; 13000.0 6400.0 … 170.0 8.0])
+[ Info: Experiment finished.
+┌ Info: Threads: 
+└   Threads.nthreads() = 8
+┌ Info: Period is
+│   hs[1] = 0.015
+└   hs[2] = 0.015
+┌ Info: Synthesizing for
+│   name = "F1"
+│   strat = HoldAndKill (generic function with 3 methods)
+│   n = 16
+└   t = 100
+[ Info: Working on constraint: (1, 2)...
+[ Info: Working on constraint: (1, 6)...
+[ Info: Working on constraint: (2, 3)...
+[ Info: Working on constraint: (2, 4)...
+[ Info: Working on constraint: (1, 5)...
+[ Info: Working on constraint: (3, 6)...
+[ Info: Working on constraint: (3, 5)...
+[ Info: Working on constraint: (5, 6)...
+┌ Info: Constraint: (5, 6)... done in 9.8 seconds.
+└   (v, i) = (0.4587, 5)
+┌ Info: Constraint: (2, 3)... done in 19.0 seconds.
+└   (v, i) = (0.4587, 5)
+[ Info: Working on constraint: (1, 4)...
+┌ Info: Constraint: (1, 2)... done in 55.0 seconds.
+└   (v, i) = (0.4587, 5)
+[ Info: Working on constraint: (1, 3)...
+┌ Info: Constraint: (3, 5)... done in 280.0 seconds.
+└   (v, i) = (0.935, 5)
+[ Info: Working on constraint: (4, 5)...
+┌ Info: Constraint: (4, 5)... done in 5.8 seconds.
+└   (v, i) = (0.4587, 5)
+┌ Info: Constraint: (2, 4)... done in 450.0 seconds.
+└   (v, i) = (0.935, 5)
+[ Info: Working on constraint: (3, 4)...
+┌ Info: Constraint: (3, 4)... done in 7.3 seconds.
+└   (v, i) = (0.4587, 5)
+┌ Info: Constraint: (1, 3)... done in 710.0 seconds.
+└   (v, i) = (0.935, 5)
+┌ Info: Constraint: (3, 6)... done in 2200.0 seconds.
+└   (v, i) = (1.305, 6)
+[ Info: Working on constraint: (4, 6)...
+┌ Info: Constraint: (4, 6)... done in 160.0 seconds.
+└   (v, i) = (0.935, 5)
+┌ Info: Constraint: (1, 4)... done in 2700.0 seconds.
+└   (v, i) = (6.177, 109)
+┌ Info: Constraint: (1, 5)... done in 6500.0 seconds.
+└   (v, i) = (109.3, 110)
+[ Info: Working on constraint: (2, 5)...
+┌ Info: Constraint: (2, 5)... done in 1900.0 seconds.
+└   (v, i) = (1.305, 6)
+┌ Info: Constraint: (1, 6)... done in 13000.0 seconds.
+└   (v, i) = (2655.0, 111)
+[ Info: Working on constraint: (2, 6)...
+┌ Info: Constraint: (2, 6)... done in 4600.0 seconds.
+└   (v, i) = (37.92, 110)
+┌ Info: Synthesizing finished for
+│   name = "F1"
+│   strat = HoldAndKill (generic function with 3 methods)
+└   (deviations, indices, time_taken) = ([0.4587 NaN … NaN NaN; 0.935 0.4587 … NaN NaN; … ; 109.3 1.305 … 0.4587 NaN; 2655.0 37.92 … 0.935 0.4587], [5 -1 … -1 -1; 5 5 … -1 -1; … ; 110 6 … 5 -1; 111 110 … 5 5], [55.0 NaN … NaN NaN; 710.0 19.0 … NaN NaN; … ; 6500.0 1900.0 … 5.8 NaN; 13000.0 4600.0 … 160.0 9.8])
+[ Info: Experiment finished.
+┌ Info: Threads: 
+└   Threads.nthreads() = 8
+┌ Info: Period is
+│   hs[1] = 0.028
+└   hs[2] = 0.02
+┌ Info: Synthesizing for
+│   name = "F1"
+│   strat = HoldAndKill (generic function with 3 methods)
+│   n = 16
+└   t = 100
+[ Info: Working on constraint: (1, 2)...
+[ Info: Working on constraint: (3, 5)...
+[ Info: Working on constraint: (2, 4)...
+[ Info: Working on constraint: (1, 5)...
+[ Info: Working on constraint: (2, 3)...
+[ Info: Working on constraint: (1, 6)...
+[ Info: Working on constraint: (3, 6)...
+[ Info: Working on constraint: (5, 6)...
+┌ Info: Constraint: (5, 6)... done in 8.9 seconds.
+└   (v, i) = (0.8467, 10)
+┌ Info: Constraint: (2, 3)... done in 21.0 seconds.
+└   (v, i) = (1.067, 25)
+[ Info: Working on constraint: (1, 4)...
+┌ Info: Constraint: (1, 2)... done in 62.0 seconds.
+└   (v, i) = (7.491, 105)
+[ Info: Working on constraint: (1, 3)...
+┌ Info: Constraint: (3, 5)... done in 320.0 seconds.
+└   (v, i) = (2956.0, 106)
+[ Info: Working on constraint: (4, 5)...
+┌ Info: Constraint: (4, 5)... done in 6.8 seconds.
+└   (v, i) = (0.9946, 10)
+┌ Info: Constraint: (2, 4)... done in 380.0 seconds.
+└   (v, i) = (1004.0, 90)
+[ Info: Working on constraint: (3, 4)...
+┌ Info: Constraint: (3, 4)... done in 8.6 seconds.
+└   (v, i) = (0.9946, 10)
+┌ Info: Constraint: (1, 3)... done in 580.0 seconds.
+└   (v, i) = (2020.0, 90)
+┌ Info: Constraint: (1, 4)... done in 1200.0 seconds.
+└   (v, i) = (1806.0, 65)
+┌ Info: Constraint: (3, 6)... done in 1500.0 seconds.
+└   (v, i) = (4852.0, 81)
+[ Info: Working on constraint: (4, 6)...
+┌ Info: Constraint: (4, 6)... done in 150.0 seconds.
+└   (v, i) = (94.43, 107)
+┌ Info: Constraint: (1, 5)... done in 3000.0 seconds.
+└   (v, i) = (7826.0, 62)
+[ Info: Working on constraint: (2, 5)...
+┌ Info: Constraint: (2, 5)... done in 1000.0 seconds.
+└   (v, i) = (1452.0, 65)
+┌ Info: Constraint: (1, 6)... done in 4400.0 seconds.
+└   (v, i) = (2327.0, 47)
+[ Info: Working on constraint: (2, 6)...
+┌ Info: Constraint: (2, 6)... done in 2900.0 seconds.
+└   (v, i) = (6150.0, 62)
+┌ Info: Synthesizing finished for
+│   name = "F1"
+│   strat = HoldAndKill (generic function with 3 methods)
+└   (deviations, indices, time_taken) = ([7.491 NaN … NaN NaN; 2020.0 1.067 … NaN NaN; … ; 7826.0 1452.0 … 0.9946 NaN; 2327.0 6150.0 … 94.43 0.8467], [105 -1 … -1 -1; 90 25 … -1 -1; … ; 62 65 … 10 -1; 47 62 … 107 10], [62.0 NaN … NaN NaN; 580.0 21.0 … NaN NaN; … ; 3000.0 1000.0 … 6.8 NaN; 4400.0 2900.0 … 150.0 8.9])
+[ Info: Experiment finished.
+┌ Info: Threads: 
+└   Threads.nthreads() = 8
+┌ Info: Period is
+│   hs[1] = 0.028
+└   hs[2] = 0.028
+┌ Info: Synthesizing for
+│   name = "F1"
+│   strat = HoldAndKill (generic function with 3 methods)
+│   n = 16
+└   t = 100
+[ Info: Working on constraint: (1, 2)...
+[ Info: Working on constraint: (1, 6)...
+[ Info: Working on constraint: (1, 5)...
+[ Info: Working on constraint: (3, 6)...
+[ Info: Working on constraint: (2, 3)...
+[ Info: Working on constraint: (3, 5)...
+[ Info: Working on constraint: (2, 4)...
+[ Info: Working on constraint: (5, 6)...
+┌ Info: Constraint: (5, 6)... done in 7.9 seconds.
+└   (v, i) = (0.7956, 4)
+┌ Info: Constraint: (2, 3)... done in 18.0 seconds.
+└   (v, i) = (0.8093, 9)
+[ Info: Working on constraint: (1, 4)...
+┌ Info: Constraint: (1, 2)... done in 51.0 seconds.
+└   (v, i) = (1.041, 9)
+[ Info: Working on constraint: (1, 3)...
+┌ Info: Constraint: (3, 5)... done in 260.0 seconds.
+└   (v, i) = (46.45, 106)
+[ Info: Working on constraint: (4, 5)...
+┌ Info: Constraint: (4, 5)... done in 5.1 seconds.
+└   (v, i) = (0.7956, 4)
+┌ Info: Constraint: (2, 4)... done in 340.0 seconds.
+└   (v, i) = (59.88, 106)
+[ Info: Working on constraint: (3, 4)...
+┌ Info: Constraint: (3, 4)... done in 8.3 seconds.
+└   (v, i) = (0.8093, 9)
+┌ Info: Constraint: (1, 3)... done in 730.0 seconds.
+└   (v, i) = (406.2, 106)
+┌ Info: Constraint: (3, 6)... done in 1400.0 seconds.
+└   (v, i) = (2870.0, 92)
+[ Info: Working on constraint: (4, 6)...
+┌ Info: Constraint: (1, 4)... done in 1500.0 seconds.
+└   (v, i) = (6662.0, 81)
+┌ Info: Constraint: (4, 6)... done in 120.0 seconds.
+└   (v, i) = (1.645, 5)
+┌ Info: Constraint: (1, 5)... done in 2700.0 seconds.
+└   (v, i) = (7595.0, 65)
+[ Info: Working on constraint: (2, 5)...
+┌ Info: Constraint: (1, 6)... done in 3500.0 seconds.
+└   (v, i) = (1875.0, 47)
+[ Info: Working on constraint: (2, 6)...
+┌ Info: Constraint: (2, 5)... done in 920.0 seconds.
+└   (v, i) = (5763.0, 81)
+┌ Info: Constraint: (2, 6)... done in 2000.0 seconds.
+└   (v, i) = (6165.0, 65)
+┌ Info: Synthesizing finished for
+│   name = "F1"
+│   strat = HoldAndKill (generic function with 3 methods)
+└   (deviations, indices, time_taken) = ([1.041 NaN … NaN NaN; 406.2 0.8093 … NaN NaN; … ; 7595.0 5763.0 … 0.7956 NaN; 1875.0 6165.0 … 1.645 0.7956], [9 -1 … -1 -1; 106 9 … -1 -1; … ; 65 81 … 4 -1; 47 65 … 5 4], [51.0 NaN … NaN NaN; 730.0 18.0 … NaN NaN; … ; 2700.0 920.0 … 5.1 NaN; 3500.0 2000.0 … 120.0 7.9])
+[ Info: Experiment finished.
+┌ Info: Threads: 
+└   Threads.nthreads() = 8
+┌ Info: Period is
+│   hs[1] = 0.04
+└   hs[2] = 0.02
+┌ Info: Synthesizing for
+│   name = "F1"
+│   strat = HoldAndKill (generic function with 3 methods)
+│   n = 16
+└   t = 100
+[ Info: Working on constraint: (1, 2)...
+[ Info: Working on constraint: (1, 5)...
+[ Info: Working on constraint: (2, 4)...
+[ Info: Working on constraint: (1, 6)...
+[ Info: Working on constraint: (3, 5)...
+[ Info: Working on constraint: (2, 3)...
+[ Info: Working on constraint: (5, 6)...
+[ Info: Working on constraint: (3, 6)...
+┌ Info: Constraint: (5, 6)... done in 3.5 seconds.
+└   (v, i) = (1338.0, 81)
+┌ Info: Constraint: (2, 3)... done in 6.6 seconds.
+└   (v, i) = (1538.0, 65)
+[ Info: Working on constraint: (1, 4)...
+┌ Info: Constraint: (1, 2)... done in 29.0 seconds.
+└   (v, i) = (3137.0, 65)
+[ Info: Working on constraint: (1, 3)...
+┌ Info: Constraint: (3, 5)... done in 98.0 seconds.
+└   (v, i) = (3993.0, 47)
+[ Info: Working on constraint: (4, 5)...
+┌ Info: Constraint: (4, 5)... done in 3.3 seconds.
+└   (v, i) = (5735.0, 81)
+┌ Info: Constraint: (2, 4)... done in 130.0 seconds.
+└   (v, i) = (4657.0, 47)
+[ Info: Working on constraint: (3, 4)...
+┌ Info: Constraint: (3, 4)... done in 4.1 seconds.
+└   (v, i) = (1151.0, 65)
+┌ Info: Constraint: (1, 3)... done in 210.0 seconds.
+└   (v, i) = (5523.0, 47)
+┌ Info: Constraint: (3, 6)... done in 610.0 seconds.
+└   (v, i) = (19840.0, 49)
+[ Info: Working on constraint: (4, 6)...
+┌ Info: Constraint: (4, 6)... done in 59.0 seconds.
+└   (v, i) = (11120.0, 62)
+┌ Info: Constraint: (1, 4)... done in 710.0 seconds.
+└   (v, i) = (30390.0, 49)
+┌ Info: Constraint: (1, 5)... done in 960.0 seconds.
+└   (v, i) = (1163.0, 33)
+[ Info: Working on constraint: (2, 5)...
+┌ Info: Constraint: (2, 5)... done in 400.0 seconds.
+└   (v, i) = (27530.0, 49)
+┌ Info: Constraint: (1, 6)... done in 1800.0 seconds.
+└   (v, i) = (1388.0, 33)
+[ Info: Working on constraint: (2, 6)...
+┌ Info: Constraint: (2, 6)... done in 650.0 seconds.
+└   (v, i) = (1041.0, 33)
+┌ Info: Synthesizing finished for
+│   name = "F1"
+│   strat = HoldAndKill (generic function with 3 methods)
+└   (deviations, indices, time_taken) = ([3137.0 NaN … NaN NaN; 5523.0 1538.0 … NaN NaN; … ; 1163.0 27530.0 … 5735.0 NaN; 1388.0 1041.0 … 11120.0 1338.0], [65 -1 … -1 -1; 47 65 … -1 -1; … ; 33 49 … 81 -1; 33 33 … 62 81], [29.0 NaN … NaN NaN; 210.0 6.6 … NaN NaN; … ; 960.0 400.0 … 3.3 NaN; 1800.0 650.0 … 59.0 3.5])
+[ Info: Experiment finished.
+┌ Info: Threads: 
+└   Threads.nthreads() = 8
+┌ Info: Period is
+│   hs[1] = 0.04
+└   hs[2] = 0.04
+┌ Info: Synthesizing for
+│   name = "F1"
+│   strat = HoldAndKill (generic function with 3 methods)
+│   n = 16
+└   t = 100
+[ Info: Working on constraint: (1, 2)...
+[ Info: Working on constraint: (2, 4)...
+[ Info: Working on constraint: (1, 5)...
+[ Info: Working on constraint: (2, 3)...
+[ Info: Working on constraint: (1, 6)...
+[ Info: Working on constraint: (3, 5)...
+[ Info: Working on constraint: (5, 6)...
+[ Info: Working on constraint: (3, 6)...
+┌ Info: Constraint: (5, 6)... done in 5.4 seconds.
+└   (v, i) = (1.063, 4)
+┌ Info: Constraint: (2, 3)... done in 13.0 seconds.
+└   (v, i) = (140.8, 104)
+[ Info: Working on constraint: (1, 4)...
+┌ Info: Constraint: (1, 2)... done in 54.0 seconds.
+└   (v, i) = (567.6, 104)
+[ Info: Working on constraint: (1, 3)...
+┌ Info: Constraint: (3, 5)... done in 140.0 seconds.
+└   (v, i) = (1250.0, 65)
+[ Info: Working on constraint: (4, 5)...
+┌ Info: Constraint: (4, 5)... done in 6.2 seconds.
+└   (v, i) = (5.79, 103)
+┌ Info: Constraint: (2, 4)... done in 200.0 seconds.
+└   (v, i) = (2611.0, 63)
+[ Info: Working on constraint: (3, 4)...
+┌ Info: Constraint: (3, 4)... done in 7.5 seconds.
+└   (v, i) = (102.1, 104)
+┌ Info: Constraint: (1, 3)... done in 260.0 seconds.
+└   (v, i) = (4467.0, 63)
+┌ Info: Constraint: (3, 6)... done in 620.0 seconds.
+└   (v, i) = (1703.0, 49)
+[ Info: Working on constraint: (4, 6)...
+┌ Info: Constraint: (1, 4)... done in 640.0 seconds.
+└   (v, i) = (9849.0, 49)
+┌ Info: Constraint: (4, 6)... done in 100.0 seconds.
+└   (v, i) = (664.1, 104)
+┌ Info: Constraint: (1, 5)... done in 1400.0 seconds.
+└   (v, i) = (33940.0, 49)
+[ Info: Working on constraint: (2, 5)...
+┌ Info: Constraint: (1, 6)... done in 1800.0 seconds.
+└   (v, i) = (1162.0, 33)
+[ Info: Working on constraint: (2, 6)...
+┌ Info: Constraint: (2, 5)... done in 400.0 seconds.
+└   (v, i) = (9342.0, 49)
+┌ Info: Constraint: (2, 6)... done in 1100.0 seconds.
+└   (v, i) = (30860.0, 49)
+┌ Info: Synthesizing finished for
+│   name = "F1"
+│   strat = HoldAndKill (generic function with 3 methods)
+└   (deviations, indices, time_taken) = ([567.6 NaN … NaN NaN; 4467.0 140.8 … NaN NaN; … ; 33940.0 9342.0 … 5.79 NaN; 1162.0 30860.0 … 664.1 1.063], [104 -1 … -1 -1; 63 104 … -1 -1; … ; 49 49 … 103 -1; 33 49 … 104 4], [54.0 NaN … NaN NaN; 260.0 13.0 … NaN NaN; … ; 1400.0 400.0 … 6.2 NaN; 1800.0 1100.0 … 100.0 5.4])
+[ Info: Experiment finished.
