@@ -277,14 +277,18 @@ begin
 		constraints
 	end
 	
-	function compare_gain(path1, path2, path3, threshold_percent)
+	function compare_gain(path1, path2, path3, threshold_percent, percentmode=true)
 		dev1, ind1, w = getdev(path1, sigdigits=3)
 		dev2, ind2, w = getdev(path2, sigdigits=3)
 		dev3, ind3, w = getdev(path3, sigdigits=3)
-	
-		min_v = minimum(x -> isnan(x) ? Inf  : x, vcat(dev1, dev2, dev3))
-		max_v = maximum(x -> isnan(x) ? -Inf : x, vcat(dev1, dev2, dev3))
-		threshold = min_v + (min(max_v, 1000) - min_v) * threshold_percent
+
+		if percentmode
+			min_v = minimum(x -> isnan(x) ? Inf  : x, vcat(dev1, dev2, dev3))
+			max_v = maximum(x -> isnan(x) ? -Inf : x, vcat(dev1, dev2, dev3))
+			threshold = min_v + (min(max_v, 1000) - min_v) * threshold_percent
+		else
+			threshold = threshold_percent
+		end
 		
 		to_show = fill("   ", (w, w))
 	
@@ -307,15 +311,17 @@ begin
 		# @info deviations indices
 		# display("text/plain", [dev1; ind1])
 		# @info threshold
-		@info to_show
-		threshold
+		to_show
+		
+		# @info to_show
+		# threshold
 	end
 	function compare_sys(path, sys, threshold, p1, p2)
 		path1 = "$path/$(p1)s_$(sys["p"])s/"
 		path2 = "$path/$(p2)s_$(sys["p"])s/"
 		path3 = "$path/$(p1)s_$(p1)s/"
 		filename = "$(sys["name"])_$(sys["x0"])_n$(sys["n"])_t100.csv"
-		compare_gain(path1*filename, path2*filename, path3*filename, threshold)
+		compare_gain(path1*filename, path2*filename, path3*filename, threshold, false)
 	end
 	function load_sys(path, sys, threshold, p1, p2)
 		path1 = "$path/$(p1)s_$(sys["p"])s/"
@@ -339,8 +345,23 @@ systems = [
     Dict([("name", "CC2"), ("x0", 1), ("n", 20), ("p", 0.028), ("ctrl", "pole_place"), ("ctrl_args", (0.85))])
 ]
 
-# ╔═╡ 1a8a6ddb-c4c6-4ae4-98c8-870d4ce8448c
-begin
+# ╔═╡ ffd30614-bcd1-4731-95c8-53a8afeb42da
+@bind RC Slider(0:0.01:1, default=0.32, show_value=true)
+
+# ╔═╡ 1ae579f7-4305-434d-815a-1a2fe693d7ce
+@bind F1 Slider(0:0.01:1, default=0.02, show_value=true)
+
+# ╔═╡ 2df35efa-7df9-4ec8-b2f7-9c0b3828ad1e
+@bind DC Slider(0:0.01:1, default=0.5, show_value=true)
+
+# ╔═╡ 909d3c26-1030-42f8-b46b-d3cb4b1e7a70
+@bind CS Slider(0:0.01:1, default=0.76, show_value=true)
+
+# ╔═╡ 463edf21-d243-4337-9475-528cd3a1bb1a
+@bind CC Slider(0:0.01:1, default=0.08, show_value=true)
+
+# ╔═╡ d18c1d63-c647-41e3-a80f-7a0443365800
+let
 	p1 = 0.040  # 40ms
 	p2 = 0.028  # 28ms
 
@@ -348,42 +369,162 @@ begin
 	# case 2: period = 28ms, w/o redesign
 	# case 3: period = 40ms, w/  redesign (mention F1 is the main culprit if have space)
 	
-	# case 4: period = 28ms, w/  redesign
 	# case 5: period = 15ms, w/o redesign
+	# case 4: period = 28ms, w/o redesign
 	# case 6: period = 15ms, w/  redesign
+	
+	RC_threshold = 1.4
+	F1_threshold = 20.8
+	DC_threshold = 3.5
+	CS_threshold = 9.4
+	CC_threshold = 80.1
+	
+	@info [compare_sys("../experiments/data/finalize", systems[1], RC_threshold, p1, p2), compare_sys("../experiments/data/finalize", systems[2], F1_threshold, p1, p2), compare_sys("../experiments/data/finalize", systems[3], DC_threshold, p1, p2), compare_sys("../experiments/data/ccs_lqr", systems[4], CS_threshold, p1, p2), compare_sys("../experiments/data/cc2_0.9pole", systems[5], CC_threshold, p1, p2)]
+
+	RC1, RC2, RC3 = load_sys("../experiments/data/finalize", systems[1], RC_threshold, p1, p2)
+	F11, F12, F13 = load_sys("../experiments/data/finalize", systems[2], F1_threshold, p1, p2)
+	DC1, DC2, DC3 = load_sys("../experiments/data/finalize", systems[3], DC_threshold, p1, p2)
+	CS1, CS2, CS3 = load_sys("../experiments/data/ccs_lqr", systems[4], CS_threshold, p1, p2)
+	CC1, CC2, CC3 = load_sys("../experiments/data/cc2_0.9pole", systems[5], CC_threshold, p1, p2)
+
+	# @info RC1, F11, DC1, CS1, CC1
+	# @info RC2, F12, DC2, CS2, CC2
+	# @info RC3, F13, DC3, CS3, CC3
+	
+	for c1 in RC1, c2 in F11, c3 in DC1, c4 in CS1, c5 in CC1
+		path = isschedulable(c1, c2, c3, c4, c5, cores=3)
+		if length(path) > 0
+			@info "Found results case 1" c1 c2 c3 c4 c5 map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
+			break
+		end
+	end
+	for c1 in RC2, c2 in F12, c3 in DC2, c4 in CS2, c5 in CC2
+		path = isschedulable(c1, c2, c3, c4, c5, cores=2)
+		if length(path) > 0
+			@info "Found results case 2" c1 c2 c3 c4 c5 map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
+			break
+		end
+	end
+	for c1 in RC3, c2 in F13, c3 in DC3, c4 in CS3, c5 in CC3
+		path = isschedulable(c1, c2, c3, c4, c5, cores=3)
+		if length(path) > 0
+			@info "Found results case 3" c1 c2 c3 c4 c5 map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
+			break
+		end
+	end
 end
 
-# ╔═╡ ffd30614-bcd1-4731-95c8-53a8afeb42da
-@bind RC Slider(0:0.01:1, default=0.32, show_value=true)
+# ╔═╡ 9a60968f-31c1-4339-8d98-8d0dd0a16961
+let
+	p1 = 0.015  # 40ms
+	p2 = 0.028  # 28ms
 
-# ╔═╡ 1f6cb76b-8d2b-49a1-a8b6-3d16e617a2c0
-RC_threshold = compare_sys("../experiments/data/finalize", systems[1], RC, p1, p2)
+	# case 1: period = 40ms (3 tasks), w/o redesign
+	# case 2: period = 28ms, w/o redesign
+	# case 3: period = 40ms, w/  redesign (mention F1 is the main culprit if have space)
+	
+	# case 5: period = 15ms, w/o redesign
+	# case 4: period = 28ms, w/o redesign
+	# case 6: period = 15ms, w/  redesign
+	
+	RC_threshold = 1.4
+	F1_threshold = 20.8
+	DC_threshold = 3.5
+	CS_threshold = 20
+	CC_threshold = 80.1
+	
+	@info [compare_sys("../experiments/data/finalize", systems[1], RC_threshold, p1, p2), compare_sys("../experiments/data/finalize", systems[2], F1_threshold, p1, p2), compare_sys("../experiments/data/finalize", systems[3], DC_threshold, p1, p2), compare_sys("../experiments/data/ccs_lqr", systems[4], CS_threshold, p1, p2), compare_sys("../experiments/data/cc2_0.9pole", systems[5], CC_threshold, p1, p2)]
 
-# ╔═╡ 1ae579f7-4305-434d-815a-1a2fe693d7ce
-@bind F1 Slider(0:0.01:1, default=0.02, show_value=true)
+	RC1, RC2, RC3 = load_sys("../experiments/data/finalize", systems[1], RC_threshold, p1, p2)
+	F11, F12, F13 = load_sys("../experiments/data/finalize", systems[2], F1_threshold, p1, p2)
+	DC1, DC2, DC3 = load_sys("../experiments/data/finalize", systems[3], DC_threshold, p1, p2)
+	CS1, CS2, CS3 = load_sys("../experiments/data/ccs_lqr", systems[4], CS_threshold, p1, p2)
+	CC1, CC2, CC3 = load_sys("../experiments/data/cc2_0.9pole", systems[5], CC_threshold, p1, p2)
 
-# ╔═╡ 0aa39f38-1c75-45aa-bb24-1aaa47128535
-F1_threshold = compare_sys("../experiments/data/finalize", systems[2], F1, p1, p2)
+	# @info RC1, F11, DC1, CS1, CC1
+	# @info RC2, F12, DC2, CS2, CC2
+	@info RC3, F13, DC3, CS3, CC3
+	
+	for c1 in RC1, c2 in F11, c3 in DC1, c4 in CS1, c5 in CC1
+		path = isschedulable(c1, c2, c3, c4, c5, cores=1)
+		if length(path) > 0
+			@info "Found results case 1" c1 c2 c3 c4 c5 map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
+			break
+		end
+	end
+	for c1 in RC2, c2 in F12, c3 in DC2, c4 in CS2, c5 in CC2
+		path = isschedulable(c1, c2, c3, c4, c5, cores=2)
+		if length(path) > 0
+			@info "Found results case 2" c1 c2 c3 c4 c5 map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
+			break
+		end
+	end
+	for c1 in RC3, c2 in F13, c3 in DC3, c4 in CS3, c5 in CC3
+		path = isschedulable(c1, c2, c3, c4, c5, cores=1)
+		if length(path) > 0
+			@info "Found results case 3" c1 c2 c3 c4 c5 map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
+			break
+		end
+	end
+end
 
-# ╔═╡ 2df35efa-7df9-4ec8-b2f7-9c0b3828ad1e
-@bind DC Slider(0:0.01:1, default=0.5, show_value=true)
+# ╔═╡ ccec61e4-5c71-49a4-bcd1-59655ba15311
+let
+	p1 = 0.028  # 40ms
+	p2 = 0.028  # 28ms
 
-# ╔═╡ 2f15b86d-193e-45fa-a99b-b10f118f69fe
-DC_threshold = compare_sys("../experiments/data/finalize", systems[3], DC, p1, p2)
+	# case 1: period = 40ms (3 tasks), w/o redesign
+	# case 2: period = 28ms, w/o redesign
+	# case 3: period = 40ms, w/  redesign (mention F1 is the main culprit if have space)
+	
+	# case 5: period = 15ms, w/o redesign
+	# case 4: period = 28ms, w/o redesign
+	# case 6: period = 15ms, w/  redesign
+	
+	RC_threshold = 1.4
+	F1_threshold = 20.8
+	DC_threshold = 3.5
+	CS_threshold = 9.4
+	CC_threshold = 80.1
+	
+	@info [compare_sys("../experiments/data/finalize", systems[1], RC_threshold, p1, p2), compare_sys("../experiments/data/finalize", systems[2], F1_threshold, p1, p2), compare_sys("../experiments/data/finalize", systems[3], DC_threshold, p1, p2), compare_sys("../experiments/data/ccs_lqr", systems[4], CS_threshold, p1, p2), compare_sys("../experiments/data/cc2_0.9pole", systems[5], CC_threshold, p1, p2)]
 
-# ╔═╡ 909d3c26-1030-42f8-b46b-d3cb4b1e7a70
-@bind CS Slider(0:0.01:1, default=0.76, show_value=true)
+	RC1, RC2, RC3 = load_sys("../experiments/data/finalize", systems[1], RC_threshold, p1, p2)
+	F11, F12, F13 = load_sys("../experiments/data/finalize", systems[2], F1_threshold, p1, p2)
+	DC1, DC2, DC3 = load_sys("../experiments/data/finalize", systems[3], DC_threshold, p1, p2)
+	CS1, CS2, CS3 = load_sys("../experiments/data/ccs_lqr", systems[4], CS_threshold, p1, p2)
+	CC1, CC2, CC3 = load_sys("../experiments/data/cc2_0.9pole", systems[5], CC_threshold, p1, p2)
 
-# ╔═╡ 641a246c-0fdb-4c5d-8d6a-5c17617b6904
-CS_threshold = compare_sys("../experiments/data/ccs_lqr", systems[4], CS, p1, p2)
-
-# ╔═╡ 463edf21-d243-4337-9475-528cd3a1bb1a
-@bind CC Slider(0:0.01:1, default=0.08, show_value=true)
-
-# ╔═╡ 0e44d745-a73b-4ff5-b38d-7f94d154d508
-CC_threshold = compare_sys("../experiments/data/cc2_0.9pole", systems[5], CC, p1, p2)
+	# @info RC1, F11, DC1, CS1, CC1
+	# @info RC2, F12, DC2, CS2, CC2
+	# @info RC3, F13, DC3, CS3, CC3
+	
+	for c1 in RC1, c2 in F11, c3 in DC1, c4 in CS1, c5 in CC1
+		path = isschedulable(c1, c2, c3, c4, c5, cores=2)
+		if length(path) > 0
+			@info "Found results case 1" c1 c2 c3 c4 c5 map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
+			break
+		end
+	end
+	for c1 in RC2, c2 in F12, c3 in DC2, c4 in CS2, c5 in CC2
+		path = isschedulable(c1, c2, c3, c4, c5, cores=2)
+		if length(path) > 0
+			@info "Found results case 2" c1 c2 c3 c4 c5 map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
+			break
+		end
+	end
+	for c1 in RC3, c2 in F13, c3 in DC3, c4 in CS3, c5 in CC3
+		path = isschedulable(c1, c2, c3, c4, c5, cores=2)
+		if length(path) > 0
+			@info "Found results case 3" c1 c2 c3 c4 c5 map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
+			break
+		end
+	end
+end
 
 # ╔═╡ 5f18424a-5085-4e43-a3ba-6f7e51a3e2dc
+# ╠═╡ disabled = true
+#=╠═╡
 let
 	RC1, RC2, RC3 = load_sys("../experiments/data/finalize", systems[1], RC_threshold, p1, p2)
 	F11, F12, F13 = load_sys("../experiments/data/finalize", systems[2], F1_threshold, p1, p2)
@@ -417,6 +558,7 @@ let
 		end
 	end
 end
+  ╠═╡ =#
 
 # ╔═╡ ea5ec578-0d5e-4c40-8082-8b806d2b5e99
 md"""
@@ -481,17 +623,14 @@ end
 # ╠═84aca27f-c6d3-4824-892d-444fdc36d612
 # ╠═f9c740f3-b134-455e-9472-eb091bda35e1
 # ╠═24733f39-edb0-4222-b7d4-0235f885aeb7
-# ╠═1a8a6ddb-c4c6-4ae4-98c8-870d4ce8448c
 # ╠═ffd30614-bcd1-4731-95c8-53a8afeb42da
-# ╠═1f6cb76b-8d2b-49a1-a8b6-3d16e617a2c0
 # ╠═1ae579f7-4305-434d-815a-1a2fe693d7ce
-# ╠═0aa39f38-1c75-45aa-bb24-1aaa47128535
 # ╠═2df35efa-7df9-4ec8-b2f7-9c0b3828ad1e
-# ╠═2f15b86d-193e-45fa-a99b-b10f118f69fe
 # ╠═909d3c26-1030-42f8-b46b-d3cb4b1e7a70
-# ╠═641a246c-0fdb-4c5d-8d6a-5c17617b6904
 # ╠═463edf21-d243-4337-9475-528cd3a1bb1a
-# ╠═0e44d745-a73b-4ff5-b38d-7f94d154d508
+# ╠═d18c1d63-c647-41e3-a80f-7a0443365800
+# ╠═9a60968f-31c1-4339-8d98-8d0dd0a16961
+# ╠═ccec61e4-5c71-49a4-bcd1-59655ba15311
 # ╠═5f18424a-5085-4e43-a3ba-6f7e51a3e2dc
 # ╟─ea5ec578-0d5e-4c40-8082-8b806d2b5e99
 # ╠═470a7307-82a4-4a30-a308-6d8ade16a2f4
