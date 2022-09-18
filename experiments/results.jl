@@ -104,9 +104,6 @@ systems = [
     Dict([("name", "CC2"), ("x0", 1), ("n", 20), ("p", 0.028), ("ctrl", "pole_place"), ("ctrl_args", (0.85))])
 ]
 
-# ╔═╡ 5f80af0d-d220-4f22-8507-c8dae4335433
-@bind RC Slider(0:0.01:1, show_value=true)
-
 # ╔═╡ 6bb79ca7-2dc1-4ce8-aceb-621356a96bca
 function compare_sys(path, sys, threshold, p1, p2)
 	path1 = "$path/$(p1)s_$(sys["p"])s/"
@@ -122,14 +119,10 @@ begin
 	p2 = 0.028
 end
 
+# ╔═╡ 5f80af0d-d220-4f22-8507-c8dae4335433
+@bind RC Slider(0:0.01:1, show_value=true)
+
 # ╔═╡ 0c1086a3-207a-4ed7-b23c-6bf2e739d5fb
-# let
-# 	path1 = "./data/finalize/0.04s_0.023s/"
-# 	path2 = "./data/finalize/0.028s_0.023s/"
-# 	path3 = "./data/finalize/0.04s_0.04s/"
-# 	filename = "RC_100_n10_t100.csv"
-# 	compare_gain(path1*filename, path2*filename, path3*filename, RC)
-# end
 compare_sys("./data/finalize", systems[1], RC, p1, p2)
 
 # ╔═╡ 7a3cc4ad-13ce-4705-ae51-b4782559e1aa
@@ -544,9 +537,9 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╠═e2a0c124-bf14-4fbc-bddb-959d1220581b
 # ╠═acb69bf3-7f44-4e49-9e04-619e455db184
 # ╠═2b524bb2-0e93-4550-b806-ce4bcfc7d6a9
-# ╠═5f80af0d-d220-4f22-8507-c8dae4335433
 # ╠═6bb79ca7-2dc1-4ce8-aceb-621356a96bca
 # ╠═56afdb38-7c45-4b95-9f6a-04c958d7aa89
+# ╠═5f80af0d-d220-4f22-8507-c8dae4335433
 # ╠═0c1086a3-207a-4ed7-b23c-6bf2e739d5fb
 # ╠═7a3cc4ad-13ce-4705-ae51-b4782559e1aa
 # ╠═d9346519-644a-4202-8eda-e7c6c61eb521

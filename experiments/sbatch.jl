@@ -1,8 +1,8 @@
 systems = [
     # Dict([("name", "RC"), ("x0", 100), ("n", 10), ("p", 0.023), ("ctrl", "delay_lqr"), ("ctrl_args", ())]),
-    # Dict([("name", "F1"), ("x0", 1), ("n", 16), ("p", 0.020), ("ctrl", "delay_lqr"), ("ctrl_args", ())]),
+    Dict([("name", "F1"), ("x0", 1), ("n", 10), ("p", 0.020), ("ctrl", "delay_lqr"), ("ctrl_args", ())]),
     # Dict([("name", "DCM"), ("x0", 100), ("n", 10), ("p", 0.023), ("ctrl", "delay_lqr"), ("ctrl_args", ())]),
-    Dict([("name", "CSS"), ("x0", 100), ("n", 15), ("p", 0.027), ("ctrl", "delay_lqr"), ("ctrl_args", ())]),
+    # Dict([("name", "CSS"), ("x0", 100), ("n", 15), ("p", 0.027), ("ctrl", "delay_lqr"), ("ctrl_args", ())]),
     # Dict([("name", "CC2"), ("x0", 1), ("n", 20), ("p", 0.028), ("ctrl", "pole_place"), ("ctrl_args", (0.85))])
 ]
 date_periods = [0.015, 0.028, 0.040]
