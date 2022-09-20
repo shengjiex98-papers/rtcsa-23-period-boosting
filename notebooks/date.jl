@@ -443,7 +443,7 @@ let
 
 	# @info RC1, F11, DC1, CS1, CC1
 	# @info RC2, F12, DC2, CS2, CC2
-	@info RC3, F13, DC3, CS3, CC3
+	# @info RC3, F13, DC3, CS3, CC3
 	
 	for c1 in RC1, c2 in F11, c3 in DC1, c4 in CS1, c5 in CC1
 		path = isschedulable(c1, c2, c3, c4, c5, cores=1)
@@ -466,9 +466,11 @@ let
 			break
 		end
 	end
+	"15ms and 28ms"
 end
 
 # ╔═╡ ccec61e4-5c71-49a4-bcd1-59655ba15311
+# ╠═╡ show_logs = false
 let
 	p1 = 0.028  # 40ms
 	p2 = 0.028  # 28ms
@@ -520,55 +522,18 @@ let
 			break
 		end
 	end
+	"28ms"
 end
-
-# ╔═╡ 5f18424a-5085-4e43-a3ba-6f7e51a3e2dc
-# ╠═╡ disabled = true
-#=╠═╡
-let
-	RC1, RC2, RC3 = load_sys("../experiments/data/finalize", systems[1], RC_threshold, p1, p2)
-	F11, F12, F13 = load_sys("../experiments/data/finalize", systems[2], F1_threshold, p1, p2)
-	DC1, DC2, DC3 = load_sys("../experiments/data/finalize", systems[3], DC_threshold, p1, p2)
-	CS1, CS2, CS3 = load_sys("../experiments/data/ccs_lqr", systems[4], CS_threshold, p1, p2)
-	CC1, CC2, CC3 = load_sys("../experiments/data/cc2_0.9pole", systems[5], CC_threshold, p1, p2)
-
-	# @info RC1, F11, DC1, CS1, CC1
-	# @info RC2, F12, DC2, CS2, CC2
-	# @info RC3, F13, DC3, CS3, CC3
-	
-	for c1 in RC1, c2 in F11, c3 in DC1, c4 in CS1, c5 in CC1
-		path = isschedulable(c1, c2, c3, c4, c5, cores=3)
-		if length(path) > 0
-			@info "Found results case 1" c1 c2 c3 c4 c5 map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
-			break
-		end
-	end
-	for c1 in RC2, c2 in F12, c3 in DC2, c4 in CS2, c5 in CC2
-		path = isschedulable(c1, c2, c3, c4, c5, cores=2)
-		if length(path) > 0
-			@info "Found results case 2" c1 c2 c3 c4 c5 map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
-			break
-		end
-	end
-	for c1 in RC3, c2 in F13, c3 in DC3, c4 in CS3, c5 in CC3
-		path = isschedulable(c1, c2, c3, c4, c5, cores=3)
-		if length(path) > 0
-			@info "Found results case 3" c1 c2 c3 c4 c5 map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
-			break
-		end
-	end
-end
-  ╠═╡ =#
 
 # ╔═╡ ea5ec578-0d5e-4c40-8082-8b806d2b5e99
 md"""
 | System | WCET | Period | Safety Margin |
 | ------ | ---- | ------ | ------------- |
-| RC     | 10ms | 23ms   | 1.59          |
-| F1     | 13ms | 20ms   | 3.41          |
-| DCM    | 12ms | 23ms   | 3.36          |
-| CSS    | 10ms | 27ms   | 57.5          |
-| CC     | 15ms | 28ms   | 1.05          |
+| RC     | 10ms | 23ms   |  1.4          |
+| F1     | 13ms | 20ms   | 20.8          |
+| DCM    | 12ms | 23ms   |  3.5          |
+| CSS    | 10ms | 27ms   |  9.4          |
+| CC     | 15ms | 28ms   | 80.1          |
 Utilization $$U \approx 2.51 > 1$$
 """
 
@@ -630,8 +595,7 @@ end
 # ╠═463edf21-d243-4337-9475-528cd3a1bb1a
 # ╠═d18c1d63-c647-41e3-a80f-7a0443365800
 # ╠═9a60968f-31c1-4339-8d98-8d0dd0a16961
-# ╠═ccec61e4-5c71-49a4-bcd1-59655ba15311
-# ╠═5f18424a-5085-4e43-a3ba-6f7e51a3e2dc
+# ╟─ccec61e4-5c71-49a4-bcd1-59655ba15311
 # ╟─ea5ec578-0d5e-4c40-8082-8b806d2b5e99
 # ╠═470a7307-82a4-4a30-a308-6d8ade16a2f4
 # ╠═57c2fd32-48b2-4a53-9bb3-96f28ef6c70b
