@@ -362,6 +362,17 @@ function BoundedTreeFast(automaton, bounds, n)
 	ret
 end
 
+function get_nominal(automaton, bounds, steps; dims=axes(bounds,1), nominal=repeat([2], steps-1))
+	# Dimensions: state variables, points, time
+	ev = Array{Float64}(undef, length(dims), 2^size(bounds,1), steps)
+	corners = corners_from_bounds(bounds, dims=axes(bounds,1))
+	for (i, c) in enumerate(eachcol(corners))
+		e, _ = Evol(c, automaton, nominal)
+		ev[:,i,:] = e'[dims,:]
+	end
+	
+	ev[:,1,:]
+end
 
 function deviation(automaton, bounds, reachable; dims=axes(bounds,1), metric=Euclidean(), nominal=repeat([2],size(reachable,1)-1))
 	if nominal === nothing

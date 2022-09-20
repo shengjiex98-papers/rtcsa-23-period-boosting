@@ -118,7 +118,8 @@ sys_names = sort([keys(sys_map)...])
 
 function create_job(
     sys_name::String, x0::Number, n::Int64, t::Int64, hs::Tuple{Float64, Float64}; 
-    dir::String="data/default", clr::Bool=false, one::Union{Nothing, Tuple{Int64, Int64}}=nothing, ctrl::String="delay_lqr", ctrl_args=())
+    dir::String="data/default", clr::Bool=false, one::Union{Nothing, Tuple{Int64, Int64}}=nothing, ctrl::String="delay_lqr", ctrl_args=(),
+    panicmode::Bool=false)
     @info "Threads: " Threads.nthreads()
 
     if !isdir(dir)
@@ -144,7 +145,9 @@ function create_job(
     ctrl_design = if ctrl == "delay_lqr" delay_lqr else pole_place end
     model = (c2da(system, hs[1], hs[1]), ctrl_design(system, hs[2], ctrl_args...))
     
-    if one === nothing
+    if panicmode
+        return synthesize_nominal(bounds, model, strat, t)
+    elseif one === nothing
         synthesize_full(safety_margin, bounds, model, sys_name, strat, n, max_window_size, t; dims=[2], dir=subdir, clr=clr)
     else
         synthesize_one(safety_margin, bounds, model, sys_name, strat, n, one[1], one[2], t; dims=[2], dir=subdir, clr=clr)

@@ -1,5 +1,13 @@
 include("emsoft.jl")
 
+function synthesize_nominal(bounds, model, strat, t; dims=axes(bounds, 1))
+	automaton = strat(model[1], model[2], 0, 1)
+	augbounds = Augment(bounds, automaton)
+	@info bounds, augbounds
+	
+	get_nominal(automaton, augbounds, t; dims=dims)
+end
+
 function synthesize(safety_margin, bounds, model, strat, n, max_window_size, t; dims=axes(model[1].A, 1))
 	@info "Strat is:" strat
 	
