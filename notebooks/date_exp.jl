@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.11
+# v0.19.12
 
 using Markdown
 using InteractiveUtils
@@ -360,7 +360,7 @@ end
 RC_threshold = compare_sys("../experiments/data/finalize", systems[1], RC, p1, p2)
 
 # ╔═╡ 1ae579f7-4305-434d-815a-1a2fe693d7ce
-@bind F1 Slider(0:0.01:1, default=0.02, show_value=true)
+@bind F1 Slider(0:0.0001:0.001, default=0.02, show_value=true)
 
 # ╔═╡ 0aa39f38-1c75-45aa-bb24-1aaa47128535
 F1_threshold = compare_sys("../experiments/data/finalize", systems[2], F1, p1, p2)
@@ -372,13 +372,13 @@ F1_threshold = compare_sys("../experiments/data/finalize", systems[2], F1, p1, p
 DC_threshold = compare_sys("../experiments/data/finalize", systems[3], DC, p1, p2)
 
 # ╔═╡ 909d3c26-1030-42f8-b46b-d3cb4b1e7a70
-@bind CS Slider(0:0.01:1, default=0.76, show_value=true)
+@bind CS Slider(0:0.01:10, default=0.76, show_value=true)
 
 # ╔═╡ 641a246c-0fdb-4c5d-8d6a-5c17617b6904
 CS_threshold = compare_sys("../experiments/data/ccs_lqr", systems[4], CS, p1, p2)
 
 # ╔═╡ 463edf21-d243-4337-9475-528cd3a1bb1a
-@bind CC Slider(0:0.01:1, default=0.08, show_value=true)
+@bind CC Slider(0:0.0001:0.001, default=0.0004, show_value=true)
 
 # ╔═╡ 0e44d745-a73b-4ff5-b38d-7f94d154d508
 CC_threshold = compare_sys("../experiments/data/cc2_0.9pole", systems[5], CC, p1, p2)

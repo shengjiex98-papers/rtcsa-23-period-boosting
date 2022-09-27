@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.11
+# v0.19.12
 
 using Markdown
 using InteractiveUtils
@@ -18,14 +18,27 @@ end
 begin
 	import Pkg
 	Pkg.activate("..")
-	
+
+	using Plots, LaTeXStrings
 	using PlutoUI
 	using DelimitedFiles
 	using DataStructures
+	
+	TableOfContents()
 end
 
-# ╔═╡ d2fe79ad-3b5f-461c-be6f-f3e7aaafe8fa
-# TableOfContents()
+# ╔═╡ d9f35da9-b0ef-4faf-b550-9cd1aad448ad
+md"""
+# DATE 2023
+Experimental results of our DATE 2023 paper: "Safety-aware Implementation of Control Tasks via Period Boosting and Compressing"
+
+## Setting Up
+"""
+
+# ╔═╡ cb2f6baf-cd83-4d67-9041-2fae6badf40f
+md"""
+## Schedule Synthesis
+"""
 
 # ╔═╡ e1e49746-aa18-4064-83c8-cd2e773d38ee
 begin
@@ -336,205 +349,309 @@ begin
 	[getdev, load_result, compare_gain, compare_sys, load_sys]
 end
 
-# ╔═╡ 24733f39-edb0-4222-b7d4-0235f885aeb7
-systems = [
-    Dict([("name", "RC"), ("x0", 100), ("n", 10), ("p", 0.023), ("ctrl", "delay_lqr"), ("ctrl_args", ())]),
-    Dict([("name", "F1"), ("x0", 1), ("n", 16), ("p", 0.020), ("ctrl", "delay_lqr"), ("ctrl_args", ())]),
-    Dict([("name", "DCM"), ("x0", 100), ("n", 10), ("p", 0.023), ("ctrl", "delay_lqr"), ("ctrl_args", ())]),
-    Dict([("name", "CSS"), ("x0", 100), ("n", 15), ("p", 0.027), ("ctrl", "delay_lqr"), ("ctrl_args", ())]),
-    Dict([("name", "CC2"), ("x0", 1), ("n", 20), ("p", 0.028), ("ctrl", "pole_place"), ("ctrl_args", (0.85))])
-]
-
-# ╔═╡ ffd30614-bcd1-4731-95c8-53a8afeb42da
-@bind RC Slider(0:0.01:1, default=0.32, show_value=true)
-
-# ╔═╡ 1ae579f7-4305-434d-815a-1a2fe693d7ce
-@bind F1 Slider(0:0.01:1, default=0.02, show_value=true)
-
-# ╔═╡ 2df35efa-7df9-4ec8-b2f7-9c0b3828ad1e
-@bind DC Slider(0:0.01:1, default=0.5, show_value=true)
-
-# ╔═╡ 909d3c26-1030-42f8-b46b-d3cb4b1e7a70
-@bind CS Slider(0:0.01:1, default=0.76, show_value=true)
-
-# ╔═╡ 463edf21-d243-4337-9475-528cd3a1bb1a
-@bind CC Slider(0:0.01:1, default=0.08, show_value=true)
-
-# ╔═╡ d18c1d63-c647-41e3-a80f-7a0443365800
-let
-	p1 = 0.040  # 40ms
-	p2 = 0.028  # 28ms
-
-	# case 1: period = 40ms (3 tasks), w/o redesign
-	# case 2: period = 28ms, w/o redesign
-	# case 3: period = 40ms, w/  redesign (mention F1 is the main culprit if have space)
-	
-	# case 5: period = 15ms, w/o redesign
-	# case 4: period = 28ms, w/o redesign
-	# case 6: period = 15ms, w/  redesign
+# ╔═╡ b62022c8-c7f0-4ebe-a17b-a8eb43e796ca
+begin
+	t = 100
 	
 	RC_threshold = 1.4
-	F1_threshold = 20.8
+	F1_threshold = 1.2
 	DC_threshold = 3.5
 	CS_threshold = 9.4
-	CC_threshold = 80.1
-	
-	@info [compare_sys("../experiments/data/finalize", systems[1], RC_threshold, p1, p2), compare_sys("../experiments/data/finalize", systems[2], F1_threshold, p1, p2), compare_sys("../experiments/data/finalize", systems[3], DC_threshold, p1, p2), compare_sys("../experiments/data/ccs_lqr", systems[4], CS_threshold, p1, p2), compare_sys("../experiments/data/cc2_0.9pole", systems[5], CC_threshold, p1, p2)]
-
-	RC1, RC2, RC3 = load_sys("../experiments/data/finalize", systems[1], RC_threshold, p1, p2)
-	F11, F12, F13 = load_sys("../experiments/data/finalize", systems[2], F1_threshold, p1, p2)
-	DC1, DC2, DC3 = load_sys("../experiments/data/finalize", systems[3], DC_threshold, p1, p2)
-	CS1, CS2, CS3 = load_sys("../experiments/data/ccs_lqr", systems[4], CS_threshold, p1, p2)
-	CC1, CC2, CC3 = load_sys("../experiments/data/cc2_0.9pole", systems[5], CC_threshold, p1, p2)
-
-	# @info RC1, F11, DC1, CS1, CC1
-	# @info RC2, F12, DC2, CS2, CC2
-	# @info RC3, F13, DC3, CS3, CC3
-	
-	for c1 in RC1, c2 in F11, c3 in DC1, c4 in CS1, c5 in CC1
-		path = isschedulable(c1, c2, c3, c4, c5, cores=3)
-		if length(path) > 0
-			@info "Found results case 1" c1 c2 c3 c4 c5 map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
-			break
-		end
-	end
-	for c1 in RC2, c2 in F12, c3 in DC2, c4 in CS2, c5 in CC2
-		path = isschedulable(c1, c2, c3, c4, c5, cores=2)
-		if length(path) > 0
-			@info "Found results case 2" c1 c2 c3 c4 c5 map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
-			break
-		end
-	end
-	for c1 in RC3, c2 in F13, c3 in DC3, c4 in CS3, c5 in CC3
-		path = isschedulable(c1, c2, c3, c4, c5, cores=3)
-		if length(path) > 0
-			@info "Found results case 3" c1 c2 c3 c4 c5 map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
-			break
-		end
-	end
-end
-
-# ╔═╡ 9a60968f-31c1-4339-8d98-8d0dd0a16961
-let
-	p1 = 0.015  # 40ms
-	p2 = 0.028  # 28ms
-
-	# case 1: period = 40ms (3 tasks), w/o redesign
-	# case 2: period = 28ms, w/o redesign
-	# case 3: period = 40ms, w/  redesign (mention F1 is the main culprit if have space)
-	
-	# case 5: period = 15ms, w/o redesign
-	# case 4: period = 28ms, w/o redesign
-	# case 6: period = 15ms, w/  redesign
-	
-	RC_threshold = 1.4
-	F1_threshold = 20.8
-	DC_threshold = 3.5
-	CS_threshold = 20
-	CC_threshold = 80.1
-	
-	@info [compare_sys("../experiments/data/finalize", systems[1], RC_threshold, p1, p2), compare_sys("../experiments/data/finalize", systems[2], F1_threshold, p1, p2), compare_sys("../experiments/data/finalize", systems[3], DC_threshold, p1, p2), compare_sys("../experiments/data/ccs_lqr", systems[4], CS_threshold, p1, p2), compare_sys("../experiments/data/cc2_0.9pole", systems[5], CC_threshold, p1, p2)]
-
-	RC1, RC2, RC3 = load_sys("../experiments/data/finalize", systems[1], RC_threshold, p1, p2)
-	F11, F12, F13 = load_sys("../experiments/data/finalize", systems[2], F1_threshold, p1, p2)
-	DC1, DC2, DC3 = load_sys("../experiments/data/finalize", systems[3], DC_threshold, p1, p2)
-	CS1, CS2, CS3 = load_sys("../experiments/data/ccs_lqr", systems[4], CS_threshold, p1, p2)
-	CC1, CC2, CC3 = load_sys("../experiments/data/cc2_0.9pole", systems[5], CC_threshold, p1, p2)
-
-	# @info RC1, F11, DC1, CS1, CC1
-	# @info RC2, F12, DC2, CS2, CC2
-	# @info RC3, F13, DC3, CS3, CC3
-	
-	for c1 in RC1, c2 in F11, c3 in DC1, c4 in CS1, c5 in CC1
-		path = isschedulable(c1, c2, c3, c4, c5, cores=1)
-		if length(path) > 0
-			@info "Found results case 1" c1 c2 c3 c4 c5 map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
-			break
-		end
-	end
-	for c1 in RC2, c2 in F12, c3 in DC2, c4 in CS2, c5 in CC2
-		path = isschedulable(c1, c2, c3, c4, c5, cores=2)
-		if length(path) > 0
-			@info "Found results case 2" c1 c2 c3 c4 c5 map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
-			break
-		end
-	end
-	for c1 in RC3, c2 in F13, c3 in DC3, c4 in CS3, c5 in CC3
-		path = isschedulable(c1, c2, c3, c4, c5, cores=1)
-		if length(path) > 0
-			@info "Found results case 3" c1 c2 c3 c4 c5 map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
-			break
-		end
-	end
-	"15ms and 28ms"
-end
-
-# ╔═╡ ccec61e4-5c71-49a4-bcd1-59655ba15311
-# ╠═╡ show_logs = false
-let
-	p1 = 0.028  # 40ms
-	p2 = 0.028  # 28ms
-
-	# case 1: period = 40ms (3 tasks), w/o redesign
-	# case 2: period = 28ms, w/o redesign
-	# case 3: period = 40ms, w/  redesign (mention F1 is the main culprit if have space)
-	
-	# case 5: period = 15ms, w/o redesign
-	# case 4: period = 28ms, w/o redesign
-	# case 6: period = 15ms, w/  redesign
-	
-	RC_threshold = 1.4
-	F1_threshold = 20.8
-	DC_threshold = 3.5
-	CS_threshold = 9.4
-	CC_threshold = 80.1
-	
-	@info [compare_sys("../experiments/data/finalize", systems[1], RC_threshold, p1, p2), compare_sys("../experiments/data/finalize", systems[2], F1_threshold, p1, p2), compare_sys("../experiments/data/finalize", systems[3], DC_threshold, p1, p2), compare_sys("../experiments/data/ccs_lqr", systems[4], CS_threshold, p1, p2), compare_sys("../experiments/data/cc2_0.9pole", systems[5], CC_threshold, p1, p2)]
-
-	RC1, RC2, RC3 = load_sys("../experiments/data/finalize", systems[1], RC_threshold, p1, p2)
-	F11, F12, F13 = load_sys("../experiments/data/finalize", systems[2], F1_threshold, p1, p2)
-	DC1, DC2, DC3 = load_sys("../experiments/data/finalize", systems[3], DC_threshold, p1, p2)
-	CS1, CS2, CS3 = load_sys("../experiments/data/ccs_lqr", systems[4], CS_threshold, p1, p2)
-	CC1, CC2, CC3 = load_sys("../experiments/data/cc2_0.9pole", systems[5], CC_threshold, p1, p2)
-
-	# @info RC1, F11, DC1, CS1, CC1
-	# @info RC2, F12, DC2, CS2, CC2
-	# @info RC3, F13, DC3, CS3, CC3
-	
-	for c1 in RC1, c2 in F11, c3 in DC1, c4 in CS1, c5 in CC1
-		path = isschedulable(c1, c2, c3, c4, c5, cores=2)
-		if length(path) > 0
-			@info "Found results case 1" c1 c2 c3 c4 c5 map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
-			break
-		end
-	end
-	for c1 in RC2, c2 in F12, c3 in DC2, c4 in CS2, c5 in CC2
-		path = isschedulable(c1, c2, c3, c4, c5, cores=2)
-		if length(path) > 0
-			@info "Found results case 2" c1 c2 c3 c4 c5 map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
-			break
-		end
-	end
-	for c1 in RC3, c2 in F13, c3 in DC3, c4 in CS3, c5 in CC3
-		path = isschedulable(c1, c2, c3, c4, c5, cores=2)
-		if length(path) > 0
-			@info "Found results case 3" c1 c2 c3 c4 c5 map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
-			break
-		end
-	end
-	"28ms"
+	CC_threshold = 0.53
 end
 
 # ╔═╡ ea5ec578-0d5e-4c40-8082-8b806d2b5e99
 md"""
 | System | WCET | Period | Safety Margin |
 | ------ | ---- | ------ | ------------- |
-| RC     | 10ms | 23ms   |  1.4          |
-| F1     | 13ms | 20ms   | 20.8          |
-| DCM    | 12ms | 23ms   |  3.5          |
-| CSS    | 10ms | 27ms   |  9.4          |
-| CC     | 15ms | 28ms   | 80.1          |
+| RC     | 10ms | 23ms   | $RC_threshold |
+| F1     | 13ms | 20ms   | $F1_threshold |
+| DCM    | 12ms | 23ms   | $DC_threshold |
+| CSS    | 10ms | 27ms   | $CS_threshold |
+| CC     | 15ms | 28ms   | $CC_threshold |
 Utilization $$U \approx 2.51 > 1$$
+"""
+
+# ╔═╡ 24733f39-edb0-4222-b7d4-0235f885aeb7
+systems = [
+    Dict([("name", "RC"), ("x0", 100), ("n", 10), ("p", 0.023), ("ctrl", "delay_lqr"), ("ctrl_args", ()), ("th", RC_threshold)]),
+    Dict([("name", "F1"), ("x0", 1), ("n", 16), ("p", 0.020), ("ctrl", "delay_lqr"), ("ctrl_args", ()), ("th", F1_threshold)]),
+    Dict([("name", "DCM"), ("x0", 100), ("n", 10), ("p", 0.023), ("ctrl", "delay_lqr"), ("ctrl_args", ()), ("th", DC_threshold)]),
+    Dict([("name", "CSS"), ("x0", 100), ("n", 15), ("p", 0.027), ("ctrl", "delay_lqr"), ("ctrl_args", ()), ("th", CS_threshold)]),
+    Dict([("name", "CC2"), ("x0", 1), ("n", 20), ("p", 0.028), ("ctrl", "pole_place"), ("ctrl_args", (0.9)), ("th", CC_threshold)])
+]
+
+# ╔═╡ 9a60968f-31c1-4339-8d98-8d0dd0a16961
+schedule_15_no, schedule_15_ya = let
+	p1 = 0.015  # 40ms
+	p2 = 0.028  # 28ms
+	
+	@info [compare_sys("../experiments/data/finalize", systems[1], RC_threshold, p1, p2), compare_sys("../experiments/data/finalize", systems[2], F1_threshold, p1, p2), compare_sys("../experiments/data/finalize", systems[3], DC_threshold, p1, p2), compare_sys("../experiments/data/ccs_lqr", systems[4], CS_threshold, p1, p2), compare_sys("../experiments/data/cc2_0.9pole", systems[5], CC_threshold, p1, p2)]
+
+	RC1, RC2, RC3 = load_sys("../experiments/data/finalize", systems[1], RC_threshold, p1, p2)
+	F11, F12, F13 = load_sys("../experiments/data/finalize", systems[2], F1_threshold, p1, p2)
+	DC1, DC2, DC3 = load_sys("../experiments/data/finalize", systems[3], DC_threshold, p1, p2)
+	CS1, CS2, CS3 = load_sys("../experiments/data/ccs_lqr", systems[4], CS_threshold, p1, p2)
+	CC1, CC2, CC3 = load_sys("../experiments/data/cc2_0.9pole", systems[5], CC_threshold, p1, p2)
+	
+	schedule_15_no = nothing
+	schedule_15_ya = nothing
+	for c1 in RC1, c2 in F11, c3 in DC1, c4 in CS1, c5 in CC1
+		path = isschedulable(c1, c2, c3, c4, c5, cores=1)
+		if length(path) > 0
+			schedule_15_no = map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
+			@info "Found results 15ms w/o redesign" c1 c2 c3 c4 c5 schedule_15_no
+			break
+		end
+	end
+	# for c1 in RC2, c2 in F12, c3 in DC2, c4 in CS2, c5 in CC2
+	# 	path = isschedulable(c1, c2, c3, c4, c5, cores=2)
+	# 	if length(path) > 0
+	# 		@info "Found results 28ms w/o redesign" c1 c2 c3 c4 c5 map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
+	# 		break
+	# 	end
+	# end
+	for c1 in RC3, c2 in F13, c3 in DC3, c4 in CS3, c5 in CC3
+		path = isschedulable(c1, c2, c3, c4, c5, cores=1)
+		if length(path) > 0
+			schedule_15_ya = map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
+			@info "Found results 15ms w/ redesign" c1 c2 c3 c4 c5 schedule_15_ya
+			break
+		end
+	end
+	"15ms and 28ms"
+	schedule_15_no, schedule_15_ya
+end
+
+# ╔═╡ ccec61e4-5c71-49a4-bcd1-59655ba15311
+schedule_28_no, schedule_28_ya = let
+	p1 = 0.028  # 40ms
+	p2 = 0.028  # 28ms
+	
+	@info [compare_sys("../experiments/data/finalize", systems[1], RC_threshold, p1, p2), compare_sys("../experiments/data/finalize", systems[2], F1_threshold, p1, p2), compare_sys("../experiments/data/finalize", systems[3], DC_threshold, p1, p2), compare_sys("../experiments/data/ccs_lqr", systems[4], CS_threshold, p1, p2), compare_sys("../experiments/data/cc2_0.9pole", systems[5], CC_threshold, p1, p2)]
+
+	RC1, RC2, RC3 = load_sys("../experiments/data/finalize", systems[1], RC_threshold, p1, p2)
+	F11, F12, F13 = load_sys("../experiments/data/finalize", systems[2], F1_threshold, p1, p2)
+	DC1, DC2, DC3 = load_sys("../experiments/data/finalize", systems[3], DC_threshold, p1, p2)
+	CS1, CS2, CS3 = load_sys("../experiments/data/ccs_lqr", systems[4], CS_threshold, p1, p2)
+	CC1, CC2, CC3 = load_sys("../experiments/data/cc2_0.9pole", systems[5], CC_threshold, p1, p2)
+
+	
+	schedule_28_no = nothing
+	schedule_28_ya = nothing
+	
+	for c1 in RC1, c2 in F11, c3 in DC1, c4 in CS1, c5 in CC1
+		path = isschedulable(c1, c2, c3, c4, c5, cores=2)
+		if length(path) > 0
+			schedule_28_no = map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
+			@info "Found results 28ms w/o redesign" c1 c2 c3 c4 c5 schedule_28_no
+			break
+		end
+	end
+	for c1 in RC3, c2 in F13, c3 in DC3, c4 in CS3, c5 in CC3
+		path = isschedulable(c1, c2, c3, c4, c5, cores=2)
+		if length(path) > 0
+			schedule_28_ya = map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
+			@info "Found results 28ms w/ redesign" c1 c2 c3 c4 c5 schedule_28_ya
+			break
+		end
+	end
+	"28ms"
+	schedule_28_no, schedule_28_ya
+end
+
+# ╔═╡ d18c1d63-c647-41e3-a80f-7a0443365800
+schedule_40_no, schedule_40_ya = let
+	p1 = 0.040  # 40ms
+	p2 = 0.028  # 28ms
+	
+	@info [compare_sys("../experiments/data/finalize", systems[1], RC_threshold, p1, p2), compare_sys("../experiments/data/finalize", systems[2], F1_threshold, p1, p2), compare_sys("../experiments/data/finalize", systems[3], DC_threshold, p1, p2), compare_sys("../experiments/data/ccs_lqr", systems[4], CS_threshold, p1, p2), compare_sys("../experiments/data/cc2_0.9pole", systems[5], CC_threshold, p1, p2)]
+
+	RC1, RC2, RC3 = load_sys("../experiments/data/finalize", systems[1], RC_threshold, p1, p2)
+	F11, F12, F13 = load_sys("../experiments/data/finalize", systems[2], F1_threshold, p1, p2)
+	DC1, DC2, DC3 = load_sys("../experiments/data/finalize", systems[3], DC_threshold, p1, p2)
+	CS1, CS2, CS3 = load_sys("../experiments/data/ccs_lqr", systems[4], CS_threshold, p1, p2)
+	CC1, CC2, CC3 = load_sys("../experiments/data/cc2_0.9pole", systems[5], CC_threshold, p1, p2)
+	
+	schedule_40_no = nothing
+	schedule_40_ya = nothing
+	for c1 in RC1, c2 in F11, c3 in DC1, c4 in CS1, c5 in CC1
+		path = isschedulable(c1, c2, c3, c4, c5, cores=3)
+		if length(path) > 0
+			schedule_40_no = map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
+			@info "Found results 40ms w/o redesign" c1 c2 c3 c4 c5 schedule_40_no
+			break
+		end
+	end
+	# for c1 in RC2, c2 in F12, c3 in DC2, c4 in CS2, c5 in CC2
+	# 	path = isschedulable(c1, c2, c3, c4, c5, cores=2)
+	# 	if length(path) > 0
+	# 		schedule_28_no = map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
+	# 		@info "Found results 28ms w/o redesign" c1 c2 c3 c4 c5 schedule_28_no
+	# 		break
+	# 	end
+	# end
+	for c1 in RC3, c2 in F13, c3 in DC3, c4 in CS3, c5 in CC3
+		path = isschedulable(c1, c2, c3, c4, c5, cores=3)
+		if length(path) > 0
+			schedule_40_ya = map(l -> state_separation(l, [c.windowsize for c in [c1, c2, c3, c4, c5]], indigits=true), path) |> collect
+			@info "Found results 40ms w/ redesign" c1 c2 c3 c4 c5 schedule_40_ya
+			break
+		end
+	end
+	"40ms and 28ms"
+	schedule_40_no, schedule_40_ya
+end
+
+# ╔═╡ bb040810-3ea8-4cf4-a5c4-252c156b16fc
+md"""
+## Diagrams for Dynamics
+"""
+
+# ╔═╡ efa8632b-c01a-45f3-a212-6d7f35c02045
+"""
+	ingredients(path::String)
+
+Pluto workaround to import code: Instead of using `include()`, use this.
+"""
+function ingredients(path::String)
+	# this is from the Julia source code (evalfile in base/loading.jl)
+	# but with the modification that it returns the module instead of the last object
+	name = Symbol(basename(path))
+	m = Module(name)
+	Core.eval(m,
+        Expr(:toplevel,
+             :(eval(x) = $(Expr(:core, :eval))($name, x)),
+             :(include(x) = $(Expr(:top, :include))($name, x)),
+             :(include(mapexpr::Function, x) = $(Expr(:top, :include))(mapexpr, $name, x)),
+             :(include($path))))
+	m
+end
+
+# ╔═╡ bde5c5e5-e55c-4416-b453-cc8f7dd6cc06
+function get_schedule(fullschedule, id, t)
+	dupl = findfirst(x -> x==fullschedule[end], fullschedule)
+	leng = length(fullschedule)
+	ctrl_schedule = map(x -> x[id][end], fullschedule)
+	# @info leng dupl
+
+	res = zeros(Int64, t)
+	for i = 1:t
+		if i <= leng
+			res[i] = ctrl_schedule[i]
+		else
+			res[i] = ctrl_schedule[((i-leng) % (leng-dupl)) + dupl]
+		end
+	end
+	res
+end
+
+# ╔═╡ e50ebca1-84f3-4775-9ab6-a8cf48f1ac8c
+exp = ingredients("../experiments/experiment.jl")
+
+# ╔═╡ 239a1e59-6793-446d-92c6-e1c214191178
+md"""
+|                   |                                                              |
+|------------------:|:-------------------------------------------------------------|
+|    Camera azimuth | $(@bind azimuth_2 Slider(-180:1:180, default=35, show_value=true)) |
+|  Camera elevation | $(@bind elevation_2 Slider(-90:1:90, default=25, show_value=true)) |
+"""
+
+# ╔═╡ 5383ac12-0202-4fa7-90f7-45d3a9603891
+function plotsts(systems, stsid, show, legend)
+	sts = systems[stsid]
+	
+	hit_28_no = get_schedule(schedule_28_no, stsid, t-1) .+ 1
+	hit_28_ya = get_schedule(schedule_28_ya, stsid, t-1) .+ 1
+	# hit_40_no = get_schedule(schedule_40_no, stsid, t-1) .+ 1
+	hit_40_ya = get_schedule(schedule_40_ya, stsid, t-1) .+ 1
+	
+	# traj_15_no = exp.create_traj(sts["name"], sts["x0"], t, (0.015, sts["p"]), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], hitpattern=hit_28_no)
+	# traj_15_ya = exp.create_traj(sts["name"], sts["x0"], t, (0.015, 0.015), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], hitpattern=hit_28_ya)
+	
+	nominal = exp.create_traj(sts["name"], sts["x0"], t, (sts["p"], sts["p"]), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"])
+	
+	traj_28_no = exp.create_traj(sts["name"], sts["x0"], t, (0.028, sts["p"]), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], hitpattern=hit_28_no)
+	traj_28_ya = exp.create_traj(sts["name"], sts["x0"], t, (0.028, 0.028), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], hitpattern=hit_28_ya)
+	
+	traj_40_no = exp.create_traj(sts["name"], sts["x0"], t, (0.040, sts["p"]), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], hitpattern=hit_40_ya)
+	traj_40_ya = exp.create_traj(sts["name"], sts["x0"], t, (0.040, 0.040), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], hitpattern=hit_40_ya)
+
+	traj_50_no = exp.create_traj(sts["name"], sts["x0"], t, (0.050, sts["p"]), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"])
+	traj_50_ya = exp.create_traj(sts["name"], sts["x0"], t, (0.050, 0.050), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"])
+	traj_60_no = exp.create_traj(sts["name"], sts["x0"], t, (0.060, sts["p"]), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"])
+	traj_60_ya = exp.create_traj(sts["name"], sts["x0"], t, (0.060, 0.060), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"])
+	
+	# plot(xlabel=L"x_1", ylabel=L"x_2", zlabel=L"t", legend=:topleft, format=:png, thickness_scaling=2, size=(1360,906))
+	plot(xlabel=L"x_1", ylabel=L"x_2", zlabel=L"t", legend=legend, camera=(azimuth_2,elevation_2), aspect_ratio=.7)
+	
+	# Plot safety pipe
+	θ = LinRange(0, 2π, 40)
+	circ_x = cos.(θ) * sts["th"]
+	circ_y = sin.(θ) * sts["th"]
+	for i in axes(nominal, 1)
+		plot!(circ_x .+ nominal[i,1], circ_y .+ nominal[i,2], repeat([i,], size(θ,1)), label=(i == 1) ? "Safety pipe" : "", seriestype=[:shape,], c=:lightblue, linecolor=:lightblue)
+	end
+
+	# # Plot random trajectories
+	# label_good = false
+	# # Plot the good trajectories first
+	# for i = axes(trj_2, 1)
+	# 	if dev_2[i] < pipe_radius
+	# 		plot!(trj_2[i,:,1], trj_2[i,:,2], 1:H_2+1, label=(!label_good) ? "Random" : "", color=:green, opacity=10/n_samples_2)
+	# 		label_good = true
+	# 	end
+	# end
+	
+	if show[1]
+		plot!(traj_28_no[:,1], traj_28_no[:,2], 1:t, label="28 ms w/o redesign", color=:green, linewidth=2, opacity=0.7)
+	end
+	if show[2]
+		plot!(traj_28_ya[:,1], traj_28_ya[:,2], 1:t, label="28 ms w/ redesign", color=:blue, linewidth=2, opacity=0.7)
+	end
+	if show[3]
+		plot!(traj_40_no[:,1], traj_40_no[:,2], 1:t, label="40 ms w/o redesign", color=:red, linewidth=1.5, opacity=0.7)
+	end
+	if show[4]
+		plot!(traj_40_no[1:20,1], traj_40_no[1:20,2], 1:20, label="40 ms w/o redesign", color=:red, linewidth=1.5, opacity=0.7)
+	end
+	if show[5]
+		plot!(traj_40_ya[:,1], traj_40_ya[:,2], 1:t, label="40 ms w/ redesign", color=:purple, linewidth=2, opacity=0.7)
+	end
+	plot!(traj_50_no[1:10,1], traj_50_no[1:10,2], 1:10, label="50 ms w/o redesign", color=:yellow, linewidth=1.5, opacity=0.7)
+	plot!(traj_50_ya[:,1], traj_50_ya[:,2], 1:t, label="50 ms w/ redesign", color=:pink, linewidth=2, opacity=0.7)
+	
+	# # Plot the bad trajectories on top of the good ones
+	# label_bad = false
+	nom_crosses = zeros(Float64, t)
+	# for i = axes(trj_2, 1)
+	# 	if dev_2[i] >= pipe_radius
+	# 		t_viol = argmax(dist_2[i,:], dims=1)
+	# 		#label_bad || plot!(cos.(θ) * pipe_radius .+ nominal_2[t_viol,1], sin.(θ) * pipe_radius .+ nominal_2[t_viol,2], repeat([t_viol,], size(θ,1)), label="Radius violated", style=:dot, linecolor=:gray)
+	# 		crosses = [(d >= pipe_radius) ? 1 : 0 for d in dist_2[i,:]]
+	# 		plot!(trj_2[i,:,1], trj_2[i,:,2], 1:H_2+1, label=(!label_bad) ? "Violation" : "", color=:red, markershape=:x, markeralpha=crosses)
+	# 		nom_crosses .+= crosses
+	# 		label_bad = true
+	# 	end
+	# end
+
+	# # Finally, plot the nominal trajectory on top of everything else
+	plot!(nominal[:,1], nominal[:,2], 1:t, label="Nominal", color=:black, linewidth=1, marker=:x, markeralpha=nom_crosses)
+end
+
+# ╔═╡ 802f13c0-a010-4386-8abd-70f6af2928cc
+let
+	p1 = plotsts(systems, 2, [false, false, false, false, false], :topright)
+	# p2 = plotsts(systems, 5, [true, false, true, false, true], :none)
+	# plot(p1, p2, layout=2)
+end
+
+# ╔═╡ 36e98a22-9ab5-4662-bf72-f449824de4b8
+p2 = plotsts(systems, 5, [false, false, false, false, false], :none)
+
+# ╔═╡ 68a80b94-ff3a-4c86-b997-7d295f58c889
+md"""
+## Old Experiments
 """
 
 # ╔═╡ 470a7307-82a4-4a30-a308-6d8ade16a2f4
@@ -580,32 +697,38 @@ for c1 in rc, c2 in f1, c3 in dcm, c4 in css, c5 in cc2
 end
 
 # ╔═╡ Cell order:
+# ╟─d9f35da9-b0ef-4faf-b550-9cd1aad448ad
 # ╠═3b81315c-2a0b-11ed-0388-471cd2cb6d84
-# ╠═d2fe79ad-3b5f-461c-be6f-f3e7aaafe8fa
-# ╠═e1e49746-aa18-4064-83c8-cd2e773d38ee
-# ╠═9e4e98f9-ea74-40a5-8fad-ff90002a6a27
-# ╠═58899f1b-03c9-4d0e-b49b-083b1d63b2fa
+# ╟─cb2f6baf-cd83-4d67-9041-2fae6badf40f
+# ╟─e1e49746-aa18-4064-83c8-cd2e773d38ee
+# ╟─9e4e98f9-ea74-40a5-8fad-ff90002a6a27
+# ╟─58899f1b-03c9-4d0e-b49b-083b1d63b2fa
 # ╠═84aca27f-c6d3-4824-892d-444fdc36d612
-# ╠═f9c740f3-b134-455e-9472-eb091bda35e1
+# ╟─f9c740f3-b134-455e-9472-eb091bda35e1
+# ╠═ea5ec578-0d5e-4c40-8082-8b806d2b5e99
 # ╠═24733f39-edb0-4222-b7d4-0235f885aeb7
-# ╠═ffd30614-bcd1-4731-95c8-53a8afeb42da
-# ╠═1ae579f7-4305-434d-815a-1a2fe693d7ce
-# ╠═2df35efa-7df9-4ec8-b2f7-9c0b3828ad1e
-# ╠═909d3c26-1030-42f8-b46b-d3cb4b1e7a70
-# ╠═463edf21-d243-4337-9475-528cd3a1bb1a
-# ╠═d18c1d63-c647-41e3-a80f-7a0443365800
-# ╠═9a60968f-31c1-4339-8d98-8d0dd0a16961
+# ╠═b62022c8-c7f0-4ebe-a17b-a8eb43e796ca
+# ╟─9a60968f-31c1-4339-8d98-8d0dd0a16961
 # ╟─ccec61e4-5c71-49a4-bcd1-59655ba15311
-# ╟─ea5ec578-0d5e-4c40-8082-8b806d2b5e99
-# ╠═470a7307-82a4-4a30-a308-6d8ade16a2f4
+# ╟─d18c1d63-c647-41e3-a80f-7a0443365800
+# ╟─bb040810-3ea8-4cf4-a5c4-252c156b16fc
+# ╟─efa8632b-c01a-45f3-a212-6d7f35c02045
+# ╠═bde5c5e5-e55c-4416-b453-cc8f7dd6cc06
+# ╠═e50ebca1-84f3-4775-9ab6-a8cf48f1ac8c
+# ╟─239a1e59-6793-446d-92c6-e1c214191178
+# ╠═802f13c0-a010-4386-8abd-70f6af2928cc
+# ╠═36e98a22-9ab5-4662-bf72-f449824de4b8
+# ╠═5383ac12-0202-4fa7-90f7-45d3a9603891
+# ╟─68a80b94-ff3a-4c86-b997-7d295f58c889
+# ╟─470a7307-82a4-4a30-a308-6d8ade16a2f4
 # ╠═57c2fd32-48b2-4a53-9bb3-96f28ef6c70b
-# ╠═f17e5f30-8dbb-4079-a22b-d79b05aedbed
+# ╟─f17e5f30-8dbb-4079-a22b-d79b05aedbed
 # ╠═421842ca-442c-499f-8ff5-1ac46d53e67e
-# ╠═e3f33864-27e5-4bff-be7f-942d3a8cdaf8
-# ╠═f37293d5-3ba0-4abf-898a-8d500d11302e
-# ╠═4d862328-ca2f-4656-a296-e08237fd3150
-# ╠═b3dd90f5-c87d-4d67-8094-3eaf836033f0
-# ╠═076dc76e-b93c-4642-a189-5bf233ba4eb0
-# ╠═adb5ed1f-d1ab-4eda-a362-5fd26e98b6c7
-# ╠═71875c91-2167-4fa6-a26d-91f779269796
-# ╠═29e7a702-5ef4-4f1f-bfcb-5a0b69621749
+# ╟─e3f33864-27e5-4bff-be7f-942d3a8cdaf8
+# ╟─f37293d5-3ba0-4abf-898a-8d500d11302e
+# ╟─4d862328-ca2f-4656-a296-e08237fd3150
+# ╟─b3dd90f5-c87d-4d67-8094-3eaf836033f0
+# ╟─076dc76e-b93c-4642-a189-5bf233ba4eb0
+# ╟─adb5ed1f-d1ab-4eda-a362-5fd26e98b6c7
+# ╟─71875c91-2167-4fa6-a26d-91f779269796
+# ╟─29e7a702-5ef4-4f1f-bfcb-5a0b69621749

@@ -1,11 +1,12 @@
 include("emsoft.jl")
 
-function synthesize_nominal(bounds, model, strat, t; dims=axes(bounds, 1))
-	automaton = strat(model[1], model[2], 0, 1)
+function synthesize_traj(bounds, model, strat, t; dims=axes(bounds, 1), hitpattern=repeat([2], t-1))
+	# A bug was with `automaton = strat(model[1], model[2], 0, 1)` i.e., it was forbidding any misses to occur.
+	automaton = strat(model[1], model[2])
 	augbounds = Augment(bounds, automaton)
-	@info bounds, augbounds
+	# @info bounds, augbounds
 	
-	get_nominal(automaton, augbounds, t; dims=dims)
+	get_traj(automaton, augbounds, t; dims=dims, hitpattern=hitpattern)
 end
 
 function synthesize(safety_margin, bounds, model, strat, n, max_window_size, t; dims=axes(model[1].A, 1))

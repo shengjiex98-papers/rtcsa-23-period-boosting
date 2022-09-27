@@ -116,10 +116,25 @@ sys_map = Dict(
 )
 sys_names = sort([keys(sys_map)...])
 
+function create_traj(
+    sys_name::String, x0::Number, t::Int64, hs::Tuple{Float64, Float64};
+    ctrl::String="delay_lqr", ctrl_args=(), hitpattern=repeat([2], t-1))
+
+    system = sys_map[sys_name]
+    q = size(system.A, 1)
+    bounds = repeat([x0 x0], q)
+
+    @info "Using controller design method" ctrl ctrl_args
+    strat = HoldAndKill
+    ctrl_design = if ctrl == "delay_lqr" delay_lqr else pole_place end
+    model = (c2da(system, hs[1], hs[1]), ctrl_design(system, hs[2], ctrl_args...))
+
+    return synthesize_traj(bounds, model, strat, t; hitpattern=hitpattern)
+end
+
 function create_job(
     sys_name::String, x0::Number, n::Int64, t::Int64, hs::Tuple{Float64, Float64}; 
-    dir::String="data/default", clr::Bool=false, one::Union{Nothing, Tuple{Int64, Int64}}=nothing, ctrl::String="delay_lqr", ctrl_args=(),
-    panicmode::Bool=false)
+    dir::String="data/default", clr::Bool=false, one::Union{Nothing, Tuple{Int64, Int64}}=nothing, ctrl::String="delay_lqr", ctrl_args=())
     @info "Threads: " Threads.nthreads()
 
     if !isdir(dir)
@@ -145,9 +160,7 @@ function create_job(
     ctrl_design = if ctrl == "delay_lqr" delay_lqr else pole_place end
     model = (c2da(system, hs[1], hs[1]), ctrl_design(system, hs[2], ctrl_args...))
     
-    if panicmode
-        return synthesize_nominal(bounds, model, strat, t)
-    elseif one === nothing
+    if one === nothing
         synthesize_full(safety_margin, bounds, model, sys_name, strat, n, max_window_size, t; dims=[2], dir=subdir, clr=clr)
     else
         synthesize_one(safety_margin, bounds, model, sys_name, strat, n, one[1], one[2], t; dims=[2], dir=subdir, clr=clr)
