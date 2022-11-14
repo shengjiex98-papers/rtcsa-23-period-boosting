@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.12
+# v0.19.14
 
 using Markdown
 using InteractiveUtils
@@ -590,7 +590,7 @@ function plotsts(systems, stsid, show, legend)
 	circ_x = cos.(θ) * sts["th"]
 	circ_y = sin.(θ) * sts["th"]
 	for i in axes(nominal, 1)
-		plot!(circ_x .+ nominal[i,1], circ_y .+ nominal[i,2], repeat([i,], size(θ,1)), label=(i == 1) ? "Safety pipe" : "", seriestype=[:shape,], c=:lightblue, linecolor=:lightblue)
+		plot!(circ_x .+ nominal[i,1], circ_y .+ nominal[i,2], repeat([i,], size(θ,1)), label=(i == 1) ? "Safety Margin" : "", seriestype=[:shape,], c=:lightblue, linecolor=:lightblue)
 	end
 
 	# # Plot random trajectories
@@ -604,22 +604,22 @@ function plotsts(systems, stsid, show, legend)
 	# end
 	
 	if show[1]
-		plot!(traj_28_no[:,1], traj_28_no[:,2], 1:t, label="28 ms w/o redesign", color=:green, linewidth=2, opacity=0.7)
+		plot!(traj_28_no[:,1], traj_28_no[:,2], 1:t, label="Safe Trajectories", color=:green, linewidth=2, opacity=0.7)
 	end
 	if show[2]
-		plot!(traj_28_ya[:,1], traj_28_ya[:,2], 1:t, label="28 ms w/ redesign", color=:blue, linewidth=2, opacity=0.7)
+		plot!(traj_28_ya[:,1], traj_28_ya[:,2], 1:t, label="", color=:green, linewidth=2, opacity=0.7)
 	end
 	if show[3]
-		plot!(traj_40_no[:,1], traj_40_no[:,2], 1:t, label="40 ms w/o redesign", color=:red, linewidth=1.5, opacity=0.7)
+		plot!(traj_40_no[:,1], traj_40_no[:,2], 1:t, label="Unsafe Trajectories", color=:red, linewidth=1.5, opacity=0.7)
 	end
 	if show[4]
 		plot!(traj_40_no[1:20,1], traj_40_no[1:20,2], 1:20, label="40 ms w/o redesign", color=:red, linewidth=1.5, opacity=0.7)
 	end
 	if show[5]
-		plot!(traj_40_ya[:,1], traj_40_ya[:,2], 1:t, label="40 ms w/ redesign", color=:purple, linewidth=2, opacity=0.7)
+		plot!(traj_40_ya[:,1], traj_40_ya[:,2], 1:t, label="", color=:green, linewidth=2, opacity=0.7)
 	end
-	plot!(traj_50_no[1:10,1], traj_50_no[1:10,2], 1:10, label="50 ms w/o redesign", color=:yellow, linewidth=1.5, opacity=0.7)
-	plot!(traj_50_ya[:,1], traj_50_ya[:,2], 1:t, label="50 ms w/ redesign", color=:pink, linewidth=2, opacity=0.7)
+	# plot!(traj_50_no[1:10,1], traj_50_no[1:10,2], 1:10, label="50 ms w/o redesign", color=:yellow, linewidth=1.5, opacity=0.7)
+	# plot!(traj_50_ya[:,1], traj_50_ya[:,2], 1:t, label="50 ms w/ redesign", color=:pink, linewidth=2, opacity=0.7)
 	
 	# # Plot the bad trajectories on top of the good ones
 	# label_bad = false
@@ -636,7 +636,7 @@ function plotsts(systems, stsid, show, legend)
 	# end
 
 	# # Finally, plot the nominal trajectory on top of everything else
-	plot!(nominal[:,1], nominal[:,2], 1:t, label="Nominal", color=:black, linewidth=1, marker=:x, markeralpha=nom_crosses)
+	plot!(nominal[:,1], nominal[:,2], 1:t, label="Nominal Behavior", color=:black, linewidth=1, marker=:x, markeralpha=nom_crosses)
 end
 
 # ╔═╡ 802f13c0-a010-4386-8abd-70f6af2928cc
@@ -647,7 +647,7 @@ let
 end
 
 # ╔═╡ 36e98a22-9ab5-4662-bf72-f449824de4b8
-p2 = plotsts(systems, 5, [false, false, false, false, false], :none)
+p2 = plotsts(systems, 5, [true, false, true, false, true], :topright)
 
 # ╔═╡ 68a80b94-ff3a-4c86-b997-7d295f58c889
 md"""
