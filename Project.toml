@@ -1,6 +1,5 @@
 [deps]
 Combinatorics = "861a8166-3701-5b0c-9a16-15d98fcdc6aa"
-ControlSystems = "a6e380b2-a6ca-5380-bf3e-84a91bcd477e"
 ControlSystemsBase = "aaaaaaaa-a6ca-5380-bf3e-84a91bcd477e"
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
 Distances = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"

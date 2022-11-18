@@ -38,8 +38,8 @@ function synthesize(safety_margin, bounds, model, strat, n, max_window_size, t; 
 	deviations
 end
 
-function synthesize_full(safety_margin, bounds, model, name, strat, n, max_window_size, t; dims=axes(model[1].A, 1), dir="data/default", clr=false)
-	@info "Synthesizing for" name strat n t
+function synthesize_full(safety_margin, bounds, model, name, strat, n, max_window_size, H; dims=axes(model[1].A, 1), dir="data/default", clr=false)
+	@info "Synthesizing for" name strat n H
 
 	deviations = fill(NaN, (max_window_size-1, max_window_size-1))
     indices    = fill(-1,  (max_window_size-1, max_window_size-1))
@@ -52,7 +52,7 @@ function synthesize_full(safety_margin, bounds, model, name, strat, n, max_windo
 		@info "Working on constraint: $(constraint)..."
 		min_hits, window_size = constraint
 
-		fullpath = "$(rstrip(dir, '/'))/$(name)_$(bounds[1])_$(min_hits)_$(window_size)_n$(n)_t$(t).csv"
+		fullpath = "$(rstrip(dir, '/'))/$(name)_$(bounds[1])_$(min_hits)_$(window_size)_n$(n)_t$(H).csv"
 		if !clr && isfile(fullpath)
 			# @info "Full path is" fullpath
 			v, i, time_elapsed = readdlm(fullpath, ',', Float64)
@@ -61,7 +61,7 @@ function synthesize_full(safety_margin, bounds, model, name, strat, n, max_windo
 			start = time()
 			automaton = strat(model[1], model[2], window_size-min_hits, window_size)
 			augbounds = Augment(bounds, automaton)
-			iterations = div(t+n-1, n)
+			iterations = div(H+n-1, n)
 			v, i = BoundedTreeIter(automaton, augbounds, n, iterations, safety_margin, dims=dims)
 			v = round(v, sigdigits=4)
 			time_elapsed = round(time() - start, sigdigits=2)
@@ -79,7 +79,7 @@ function synthesize_full(safety_margin, bounds, model, name, strat, n, max_windo
 	
 	# @save "data/$(name)_$(strat).jld" deviations indices time_taken
 	
-	fullpath = "$(rstrip(dir, '/'))/$(name)_$(bounds[1])_n$(n)_t$(t).csv"
+	fullpath = "$(rstrip(dir, '/'))/$(name)_$(bounds[1])_n$(n)_t$(H).csv"
 	open(fullpath, "w") do file
 		writedlm(file, [deviations; indices; time_taken], ',')
 	end

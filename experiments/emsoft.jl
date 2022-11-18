@@ -1,5 +1,5 @@
 using LinearAlgebra
-using ControlSystems
+using ControlSystemsBase
 using Distances
 using QuadGK
 using JLD
@@ -303,7 +303,7 @@ strat_map = Dict(
 )
 strat_names = sort([keys(strat_map)...])
 
-function c2da(sysc::AbstractStateSpace{<:ControlSystems.Continuous}, Ts::Real, d::Real)
+function c2da(sysc::AbstractStateSpace{<:Continuous}, Ts::Real, d::Real)
     f_Φ = s -> ℯ^(sysc.A * s)
     Φ = f_Φ(Ts)
     Γ_0 = quadgk(f_Φ, 0, Ts-d)[1] * sysc.B
