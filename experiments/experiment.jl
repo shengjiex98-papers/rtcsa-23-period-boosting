@@ -116,6 +116,40 @@ sys_map = Dict(
 )
 sys_names = sort([keys(sys_map)...])
 
+function nominal_traj(sys::AbstractStateSpace{<:Continuous}, 
+        K::AbstractMatrix{<:Real}, p_ms::Integer, z_0::Real, H::Integer)
+    
+    steps = H
+    sysd = c2d(sys, 0.001 * p_ms)
+    z = repeat([z_0], sys.nx + sys.nu)
+
+    @info sysd, K
+
+    # Dimensions: states, 1, time
+    # nominal_traj = zeros(size(sys.C, 1), 1, steps)
+    nominal_traj = zeros(steps, sum(size(sys.B)))
+
+    for i in 1:steps
+        # if i % p_ms == 0
+            z = [sysd.A sysd.B; -K] * z
+        # else
+        #     z = [sysd.A sysd.B; zeros(sys.nu, sys.nx) I] * z
+        # end
+        # nominal_traj[:, 1, i] = sysd.C * x
+        nominal_traj[i, :] = z
+    end
+
+    nominal_traj
+end
+
+function test(sys, K, p_ms, z_0, H)
+    p = .001 * p_ms
+    @info c2d(sys, p), K
+    a = HoldAndKill(c2d(sys, p), K)
+    z_0 = repeat([z_0], sum(size(sys.B)))
+    nominal_traj = Evol(z_0, a, ones(Int64, H).+1)[1]
+end
+
 function create_traj(
     sys_name::String, x0::Number, t::Int64, hs::Tuple{Float64, Float64};
     ctrl::String="delay_lqr", ctrl_args=(), hitpattern=repeat([2], t-1))
@@ -124,10 +158,11 @@ function create_traj(
     q = size(system.A, 1)
     bounds = repeat([x0 x0], q)
 
-    @info "Using controller design method" ctrl ctrl_args
+    # @info "Using controller design method" ctrl ctrl_args
     strat = HoldAndKill
     ctrl_design = if ctrl == "delay_lqr" delay_lqr else pole_place end
-    model = (c2da(system, hs[1], hs[1]), ctrl_design(system, hs[2], ctrl_args...))
+    model = (c2d(system, hs[1]), ctrl_design(system, hs[2], ctrl_args...))
+    # @info "HELLO" model
 
     return synthesize_traj(bounds, model, strat, t; hitpattern=hitpattern)
 end

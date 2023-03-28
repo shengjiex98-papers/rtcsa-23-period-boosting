@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.14
+# v0.19.18
 
 using Markdown
 using InteractiveUtils
@@ -66,9 +66,8 @@ begin
 	[WeaklyHardConstraint, Automaton, SynthesizedAutomaton]
 end
 
-# ╔═╡ 9e4e98f9-ea74-40a5-8fad-ff90002a6a27
-begin
-	"""
+# ╔═╡ 7e7f7c54-316d-46d2-9520-0fb4fd440f28
+"""
 		undigit(d[, base=2])
 	
 	Convert a list of digits to a number. Default base=2.
@@ -87,7 +86,8 @@ begin
 	    return s
 	end
 
-	"""
+# ╔═╡ 9b5e9ffa-e5d0-4313-b602-2be77f733ddd
+"""
 		digits_b2r(x[, pad])
 	
 	A shortcut for `digits(x, base=2, pad=pad) |> reverse`
@@ -95,8 +95,9 @@ begin
 	function digits_b2r(x::Int, pad::Int=0)
 		digits(x, base=2, pad=pad) |> reverse
 	end
-	
-	"""
+
+# ╔═╡ aec6790b-50a2-4120-b01e-ee51b0355888
+"""
 		state_separation(l, B[, indigits=false])
 	
 	state_separation takes a number `l` representing the overall state of
@@ -127,9 +128,6 @@ begin
 			state_separated = map(undigit, bits_separated)
 		end
 	end
-
-	[undigit, digits_b2r, state_separation]
-end
 
 # ╔═╡ 58899f1b-03c9-4d0e-b49b-083b1d63b2fa
 begin
@@ -549,6 +547,9 @@ end
 # ╔═╡ e50ebca1-84f3-4775-9ab6-a8cf48f1ac8c
 exp = ingredients("../experiments/experiment.jl")
 
+# ╔═╡ 44344f1f-9577-45d8-9f73-ab01e2ecff47
+nominal = exp.nominal_traj(exp.sys_f1, exp.delay_lqr(exp.sys_f1, 0.02), 20, 1, 100)
+
 # ╔═╡ 239a1e59-6793-446d-92c6-e1c214191178
 md"""
 |                   |                                                              |
@@ -570,12 +571,18 @@ function plotsts(systems, stsid, show, legend)
 	# traj_15_ya = exp.create_traj(sts["name"], sts["x0"], t, (0.015, 0.015), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], hitpattern=hit_28_ya)
 	
 	nominal = exp.create_traj(sts["name"], sts["x0"], t, (sts["p"], sts["p"]), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"])
+
+	sys = exp.sys_map[sts["name"]]
+	p_ms = Int64(sts["p"] * 1000)
+	# nominal = exp.nominal_traj(sys, exp.delay_lqr(sys, sts["p"]), p_ms, sts["x0"], 100)
+	@info nominal
 	
 	traj_28_no = exp.create_traj(sts["name"], sts["x0"], t, (0.028, sts["p"]), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], hitpattern=hit_28_no)
 	traj_28_ya = exp.create_traj(sts["name"], sts["x0"], t, (0.028, 0.028), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], hitpattern=hit_28_ya)
 	
-	traj_40_no = exp.create_traj(sts["name"], sts["x0"], t, (0.040, sts["p"]), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], hitpattern=hit_40_ya)
-	traj_40_ya = exp.create_traj(sts["name"], sts["x0"], t, (0.040, 0.040), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], hitpattern=hit_40_ya)
+	traj_40_no = exp.create_traj(sts["name"], sts["x0"], t, (0.040, sts["p"]), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], hitpattern=2*ones(Int64, t-1))
+	# traj_40_no = exp.create_traj(sts["name"], sts["x0"], t, (0.040, sts["p"]), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], hitpattern=hit_40_ya)
+	traj_40_ya = exp.create_traj(sts["name"], sts["x0"], t, (0.040, 0.040), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], hitpattern=2*ones(Int64, t-1))
 
 	traj_50_no = exp.create_traj(sts["name"], sts["x0"], t, (0.050, sts["p"]), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"])
 	traj_50_ya = exp.create_traj(sts["name"], sts["x0"], t, (0.050, 0.050), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"])
@@ -583,14 +590,14 @@ function plotsts(systems, stsid, show, legend)
 	traj_60_ya = exp.create_traj(sts["name"], sts["x0"], t, (0.060, 0.060), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"])
 	
 	# plot(xlabel=L"x_1", ylabel=L"x_2", zlabel=L"t", legend=:topleft, format=:png, thickness_scaling=2, size=(1360,906))
-	plot(xlabel=L"x_1", ylabel=L"x_2", zlabel=L"t", legend=legend, camera=(azimuth_2,elevation_2), aspect_ratio=.7)
+	plt = plot(xlabel=L"x_1", ylabel=L"x_2", zlabel=L"t", legend=legend, camera=(azimuth_2,elevation_2), aspect_ratio=.7)
 	
 	# Plot safety pipe
 	θ = LinRange(0, 2π, 40)
 	circ_x = cos.(θ) * sts["th"]
 	circ_y = sin.(θ) * sts["th"]
-	for i in axes(nominal, 1)
-		plot!(circ_x .+ nominal[i,1], circ_y .+ nominal[i,2], repeat([i,], size(θ,1)), label=(i == 1) ? "Safety Margin" : "", seriestype=[:shape,], c=:lightblue, linecolor=:lightblue)
+	for i in 1:t
+		plot!(circ_x .+ nominal[i,1], circ_y .+ nominal[i,2], repeat([i], size(θ,1)), label=(i == 1) ? "Safety Margin" : "", seriestype=[:shape,], c=:lightblue, linecolor=:lightblue)
 	end
 
 	# # Plot random trajectories
@@ -604,19 +611,19 @@ function plotsts(systems, stsid, show, legend)
 	# end
 	
 	if show[1]
-		plot!(traj_28_no[:,1], traj_28_no[:,2], 1:t, label="Safe Trajectories", color=:green, linewidth=2, opacity=0.7)
+		plot!(traj_28_no[:,1], traj_28_no[:,2], (1:t).*0.028/sts["p"], label="28ms no redesign", color=:green, linewidth=2, opacity=0.7)
 	end
 	if show[2]
-		plot!(traj_28_ya[:,1], traj_28_ya[:,2], 1:t, label="", color=:green, linewidth=2, opacity=0.7)
+		plot!(traj_28_ya[:,1], traj_28_ya[:,2], (1:t).*0.028/sts["p"], label="28ms redesign", color=:green, linewidth=2, opacity=0.7)
 	end
 	if show[3]
-		plot!(traj_40_no[:,1], traj_40_no[:,2], 1:t, label="Unsafe Trajectories", color=:red, linewidth=1.5, opacity=0.7)
+		plot!(traj_40_no[:,1], traj_40_no[:,2], (1:t).*0.040/sts["p"], label="40ms no redesign", color=:red, linewidth=1.5, opacity=0.7)
 	end
 	if show[4]
-		plot!(traj_40_no[1:20,1], traj_40_no[1:20,2], 1:20, label="40 ms w/o redesign", color=:red, linewidth=1.5, opacity=0.7)
+		plot!(traj_40_no[1:20,1], traj_40_no[1:20,2], (1:20).*0.040/sts["p"], label="40ms no redesign", color=:red, linewidth=1.5, opacity=0.7)
 	end
 	if show[5]
-		plot!(traj_40_ya[:,1], traj_40_ya[:,2], 1:t, label="", color=:green, linewidth=2, opacity=0.7)
+		plot!(traj_40_ya[:,1], traj_40_ya[:,2], (1:t).*0.040/sts["p"], label="40ms redesign", color=:magenta, linewidth=2, opacity=0.7)
 	end
 	# plot!(traj_50_no[1:10,1], traj_50_no[1:10,2], 1:10, label="50 ms w/o redesign", color=:yellow, linewidth=1.5, opacity=0.7)
 	# plot!(traj_50_ya[:,1], traj_50_ya[:,2], 1:t, label="50 ms w/ redesign", color=:pink, linewidth=2, opacity=0.7)
@@ -637,17 +644,19 @@ function plotsts(systems, stsid, show, legend)
 
 	# # Finally, plot the nominal trajectory on top of everything else
 	plot!(nominal[:,1], nominal[:,2], 1:t, label="Nominal Behavior", color=:black, linewidth=1, marker=:x, markeralpha=nom_crosses)
+
+	plt
 end
 
 # ╔═╡ 802f13c0-a010-4386-8abd-70f6af2928cc
 let
-	p1 = plotsts(systems, 2, [false, false, false, false, false], :topright)
-	# p2 = plotsts(systems, 5, [true, false, true, false, true], :none)
+	# p1 = plotsts(systems, 2, [false, false, false, false, false], :topright)
+	p2 = plotsts(systems, 5, [true, true, true, false, false], :topright)
 	# plot(p1, p2, layout=2)
 end
 
 # ╔═╡ 36e98a22-9ab5-4662-bf72-f449824de4b8
-p2 = plotsts(systems, 5, [true, false, true, false, true], :topright)
+p2 = plotsts(systems, 4, [false, false, false, false, false], :topright)
 
 # ╔═╡ 68a80b94-ff3a-4c86-b997-7d295f58c889
 md"""
@@ -701,20 +710,23 @@ end
 # ╠═3b81315c-2a0b-11ed-0388-471cd2cb6d84
 # ╟─cb2f6baf-cd83-4d67-9041-2fae6badf40f
 # ╟─e1e49746-aa18-4064-83c8-cd2e773d38ee
-# ╟─9e4e98f9-ea74-40a5-8fad-ff90002a6a27
+# ╟─7e7f7c54-316d-46d2-9520-0fb4fd440f28
+# ╟─9b5e9ffa-e5d0-4313-b602-2be77f733ddd
+# ╟─aec6790b-50a2-4120-b01e-ee51b0355888
 # ╟─58899f1b-03c9-4d0e-b49b-083b1d63b2fa
-# ╠═84aca27f-c6d3-4824-892d-444fdc36d612
+# ╟─84aca27f-c6d3-4824-892d-444fdc36d612
 # ╟─f9c740f3-b134-455e-9472-eb091bda35e1
-# ╠═ea5ec578-0d5e-4c40-8082-8b806d2b5e99
+# ╟─ea5ec578-0d5e-4c40-8082-8b806d2b5e99
 # ╠═24733f39-edb0-4222-b7d4-0235f885aeb7
 # ╠═b62022c8-c7f0-4ebe-a17b-a8eb43e796ca
 # ╟─9a60968f-31c1-4339-8d98-8d0dd0a16961
 # ╟─ccec61e4-5c71-49a4-bcd1-59655ba15311
-# ╟─d18c1d63-c647-41e3-a80f-7a0443365800
+# ╠═d18c1d63-c647-41e3-a80f-7a0443365800
 # ╟─bb040810-3ea8-4cf4-a5c4-252c156b16fc
 # ╟─efa8632b-c01a-45f3-a212-6d7f35c02045
 # ╠═bde5c5e5-e55c-4416-b453-cc8f7dd6cc06
 # ╠═e50ebca1-84f3-4775-9ab6-a8cf48f1ac8c
+# ╠═44344f1f-9577-45d8-9f73-ab01e2ecff47
 # ╟─239a1e59-6793-446d-92c6-e1c214191178
 # ╠═802f13c0-a010-4386-8abd-70f6af2928cc
 # ╠═36e98a22-9ab5-4662-bf72-f449824de4b8
