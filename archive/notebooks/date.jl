@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.18
+# v0.19.26
 
 using Markdown
 using InteractiveUtils
@@ -17,7 +17,7 @@ end
 # ╔═╡ 3b81315c-2a0b-11ed-0388-471cd2cb6d84
 begin
 	import Pkg
-	Pkg.activate("..")
+	Pkg.activate("../..")
 
 	using Plots, LaTeXStrings
 	using PlutoUI
@@ -709,13 +709,13 @@ end
 # ╟─d9f35da9-b0ef-4faf-b550-9cd1aad448ad
 # ╠═3b81315c-2a0b-11ed-0388-471cd2cb6d84
 # ╟─cb2f6baf-cd83-4d67-9041-2fae6badf40f
-# ╟─e1e49746-aa18-4064-83c8-cd2e773d38ee
+# ╠═e1e49746-aa18-4064-83c8-cd2e773d38ee
 # ╟─7e7f7c54-316d-46d2-9520-0fb4fd440f28
 # ╟─9b5e9ffa-e5d0-4313-b602-2be77f733ddd
-# ╟─aec6790b-50a2-4120-b01e-ee51b0355888
+# ╠═aec6790b-50a2-4120-b01e-ee51b0355888
 # ╟─58899f1b-03c9-4d0e-b49b-083b1d63b2fa
-# ╟─84aca27f-c6d3-4824-892d-444fdc36d612
-# ╟─f9c740f3-b134-455e-9472-eb091bda35e1
+# ╠═84aca27f-c6d3-4824-892d-444fdc36d612
+# ╠═f9c740f3-b134-455e-9472-eb091bda35e1
 # ╟─ea5ec578-0d5e-4c40-8082-8b806d2b5e99
 # ╠═24733f39-edb0-4222-b7d4-0235f885aeb7
 # ╠═b62022c8-c7f0-4ebe-a17b-a8eb43e796ca
