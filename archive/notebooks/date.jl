@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.25
+# v0.19.26
 
 using Markdown
 using InteractiveUtils
@@ -558,6 +558,9 @@ md"""
 |  Camera elevation | $(@bind elevation_2 Slider(-90:1:90, default=25, show_value=true)) |
 """
 
+# ╔═╡ 1be9314d-a06c-42c0-9c67-e739b8c0423f
+
+
 # ╔═╡ 5383ac12-0202-4fa7-90f7-45d3a9603891
 function plotsts(systems, stsid, show, legend)
 	sts = systems[stsid]
@@ -650,8 +653,8 @@ end
 
 # ╔═╡ 802f13c0-a010-4386-8abd-70f6af2928cc
 let
-	# p1 = plotsts(systems, 2, [false, false, false, false, false], :topright)
-	p2 = plotsts(systems, 5, [true, true, true, false, false], :topright)
+	p1 = plotsts(systems, 2, [false, false, false, false, false], :topright)
+	# p2 = plotsts(systems, 5, [true, true, true, false, false], :topright)
 	# plot(p1, p2, layout=2)
 end
 
@@ -729,6 +732,7 @@ end
 # ╠═44344f1f-9577-45d8-9f73-ab01e2ecff47
 # ╟─239a1e59-6793-446d-92c6-e1c214191178
 # ╠═802f13c0-a010-4386-8abd-70f6af2928cc
+# ╠═1be9314d-a06c-42c0-9c67-e739b8c0423f
 # ╠═36e98a22-9ab5-4662-bf72-f449824de4b8
 # ╠═5383ac12-0202-4fa7-90f7-45d3a9603891
 # ╟─68a80b94-ff3a-4c86-b997-7d295f58c889
