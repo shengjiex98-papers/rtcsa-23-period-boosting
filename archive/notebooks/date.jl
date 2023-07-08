@@ -347,6 +347,19 @@ begin
 	[getdev, load_result, compare_gain, compare_sys, load_sys]
 end
 
+# ╔═╡ 24733f39-edb0-4222-b7d4-0235f885aeb7
+# TO FUTURE CONFUSED SELF:
+# I am manually updating the values of threshold in this cell block
+# to the values obtained from the revised experiments, so I can reuse
+# the plotting code. Don't Panic.
+systems = [
+    Dict([("name", "RC"), ("x0", 100), ("n", 10), ("p", 0.023), ("ctrl", "delay_lqr"), ("ctrl_args", ()), ("th", 5.8)]),
+    Dict([("name", "F1"), ("x0", 1), ("n", 16), ("p", 0.020), ("ctrl", "delay_lqr"), ("ctrl_args", ()), ("th", 0.37)]),
+    Dict([("name", "DCM"), ("x0", 100), ("n", 10), ("p", 0.023), ("ctrl", "delay_lqr"), ("ctrl_args", ()), ("th", 0.18)]),
+    Dict([("name", "CSS"), ("x0", 100), ("n", 15), ("p", 0.027), ("ctrl", "delay_lqr"), ("ctrl_args", ()), ("th", 2.1)]),
+    Dict([("name", "CC2"), ("x0", 1), ("n", 20), ("p", 0.028), ("ctrl", "pole_place"), ("ctrl_args", (0.9)), ("th", 0.48)])
+]
+
 # ╔═╡ b62022c8-c7f0-4ebe-a17b-a8eb43e796ca
 begin
 	t = 100
@@ -369,15 +382,6 @@ md"""
 | CC     | 15ms | 28ms   | $CC_threshold |
 Utilization $$U \approx 2.51 > 1$$
 """
-
-# ╔═╡ 24733f39-edb0-4222-b7d4-0235f885aeb7
-systems = [
-    Dict([("name", "RC"), ("x0", 100), ("n", 10), ("p", 0.023), ("ctrl", "delay_lqr"), ("ctrl_args", ()), ("th", RC_threshold)]),
-    Dict([("name", "F1"), ("x0", 1), ("n", 16), ("p", 0.020), ("ctrl", "delay_lqr"), ("ctrl_args", ()), ("th", F1_threshold)]),
-    Dict([("name", "DCM"), ("x0", 100), ("n", 10), ("p", 0.023), ("ctrl", "delay_lqr"), ("ctrl_args", ()), ("th", DC_threshold)]),
-    Dict([("name", "CSS"), ("x0", 100), ("n", 15), ("p", 0.027), ("ctrl", "delay_lqr"), ("ctrl_args", ()), ("th", CS_threshold)]),
-    Dict([("name", "CC2"), ("x0", 1), ("n", 20), ("p", 0.028), ("ctrl", "pole_place"), ("ctrl_args", (0.9)), ("th", CC_threshold)])
-]
 
 # ╔═╡ 9a60968f-31c1-4339-8d98-8d0dd0a16961
 schedule_15_no, schedule_15_ya = let
@@ -583,9 +587,14 @@ function plotsts(systems, stsid, show, legend)
 	traj_28_no = exp.create_traj(sts["name"], sts["x0"], t, (0.028, sts["p"]), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], hitpattern=hit_28_no)
 	traj_28_ya = exp.create_traj(sts["name"], sts["x0"], t, (0.028, 0.028), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], hitpattern=hit_28_ya)
 	
-	traj_40_no = exp.create_traj(sts["name"], sts["x0"], t, (0.040, sts["p"]), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], hitpattern=2*ones(Int64, t-1))
+	traj_40_no = exp.create_traj(sts["name"], sts["x0"], t, (0.040, sts["p"]), 
+		ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], 
+		# hitpattern=2*ones(Int64, t-1))
+		hitpattern=2 .- ((1:t-1) .% 3 .!= 0))
 	# traj_40_no = exp.create_traj(sts["name"], sts["x0"], t, (0.040, sts["p"]), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], hitpattern=hit_40_ya)
-	traj_40_ya = exp.create_traj(sts["name"], sts["x0"], t, (0.040, 0.040), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], hitpattern=2*ones(Int64, t-1))
+	traj_40_ya = exp.create_traj(sts["name"], sts["x0"], t, (0.040, 0.040), 
+		ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], 
+		hitpattern=2*ones(Int64, t-1))
 
 	traj_50_no = exp.create_traj(sts["name"], sts["x0"], t, (0.050, sts["p"]), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"])
 	traj_50_ya = exp.create_traj(sts["name"], sts["x0"], t, (0.050, 0.050), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"])
@@ -612,21 +621,24 @@ function plotsts(systems, stsid, show, legend)
 	# 		label_good = true
 	# 	end
 	# end
+
+	ran28 = 1:ceil(Int64, t/0.028*sts["p"])
+	ran40 = 1:ceil(Int64, t/0.040*sts["p"])
 	
 	if show[1]
-		plot!(traj_28_no[:,1], traj_28_no[:,2], (1:t).*0.028/sts["p"], label="28ms no redesign", color=:green, linewidth=2, opacity=0.7)
+		plot!(traj_28_no[ran28,1], traj_28_no[ran28,2], ran28.*0.028/sts["p"], label="28ms no redesign", color=:green, linewidth=2, opacity=0.7)
 	end
 	if show[2]
-		plot!(traj_28_ya[:,1], traj_28_ya[:,2], (1:t).*0.028/sts["p"], label="28ms redesign", color=:green, linewidth=2, opacity=0.7)
+		plot!(traj_28_ya[ran28,1], traj_28_ya[ran28,2], ran28.*0.028/sts["p"], label="28ms redesign", color=:green, linewidth=2, opacity=0.7)
 	end
 	if show[3]
-		plot!(traj_40_no[:,1], traj_40_no[:,2], (1:t).*0.040/sts["p"], label="40ms no redesign", color=:red, linewidth=1.5, opacity=0.7)
+		plot!(traj_40_no[ran40,1], traj_40_no[ran40,2], ran40.*0.040/sts["p"], label="40ms no redesign", color=:red, linewidth=1.5, opacity=0.7)
 	end
 	if show[4]
 		plot!(traj_40_no[1:20,1], traj_40_no[1:20,2], (1:20).*0.040/sts["p"], label="40ms no redesign", color=:red, linewidth=1.5, opacity=0.7)
 	end
 	if show[5]
-		plot!(traj_40_ya[:,1], traj_40_ya[:,2], (1:t).*0.040/sts["p"], label="40ms redesign", color=:magenta, linewidth=2, opacity=0.7)
+		plot!(traj_40_ya[ran40,1], traj_40_ya[ran40,2], ran40.*0.040/sts["p"], label="40ms redesign", color=:magenta, linewidth=2, opacity=0.7)
 	end
 	# plot!(traj_50_no[1:10,1], traj_50_no[1:10,2], 1:10, label="50 ms w/o redesign", color=:yellow, linewidth=1.5, opacity=0.7)
 	# plot!(traj_50_ya[:,1], traj_50_ya[:,2], 1:t, label="50 ms w/ redesign", color=:pink, linewidth=2, opacity=0.7)
@@ -653,13 +665,13 @@ end
 
 # ╔═╡ 802f13c0-a010-4386-8abd-70f6af2928cc
 let
-	p1 = plotsts(systems, 2, [false, false, false, false, false], :topright)
+	p1 = plotsts(systems, 2, [true, true, true, true, false], :topright)
 	# p2 = plotsts(systems, 5, [true, true, true, false, false], :topright)
 	# plot(p1, p2, layout=2)
 end
 
 # ╔═╡ 36e98a22-9ab5-4662-bf72-f449824de4b8
-p2 = plotsts(systems, 4, [false, false, false, false, false], :topright)
+p2 = plotsts(systems, 5, [true, true, true, false, true], :topright)
 
 # ╔═╡ 68a80b94-ff3a-4c86-b997-7d295f58c889
 md"""
