@@ -17,7 +17,7 @@ end
 # ╔═╡ 3b81315c-2a0b-11ed-0388-471cd2cb6d84
 begin
 	import Pkg
-	Pkg.activate("../..")
+	Pkg.activate("..")
 
 	using Plots, LaTeXStrings
 	using PlutoUI
@@ -590,11 +590,11 @@ function plotsts(systems, stsid, show, legend)
 	traj_40_no = exp.create_traj(sts["name"], sts["x0"], t, (0.040, sts["p"]), 
 		ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], 
 		# hitpattern=2*ones(Int64, t-1))
-		hitpattern=2 .- ((1:t-1) .% 3 .!= 0))
+		hitpattern=hit_40_ya)
 	# traj_40_no = exp.create_traj(sts["name"], sts["x0"], t, (0.040, sts["p"]), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], hitpattern=hit_40_ya)
 	traj_40_ya = exp.create_traj(sts["name"], sts["x0"], t, (0.040, 0.040), 
 		ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"], 
-		hitpattern=2*ones(Int64, t-1))
+		hitpattern=hit_40_ya)
 
 	traj_50_no = exp.create_traj(sts["name"], sts["x0"], t, (0.050, sts["p"]), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"])
 	traj_50_ya = exp.create_traj(sts["name"], sts["x0"], t, (0.050, 0.050), ctrl=sts["ctrl"], ctrl_args=sts["ctrl_args"])
