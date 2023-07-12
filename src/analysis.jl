@@ -199,18 +199,6 @@ md"""
 | Elevation | $(@bind el Slider(-90:1:90,   default=25, show_value=true)) |
 """
 
-# ╔═╡ d07fe9f5-c1da-48ef-a58d-d865be62eb33
-# ╠═╡ disabled = true
-#=╠═╡
-pd(s::Symbol, newp::Integer) = plotdev(benchmarks[s], K[s], newp,
-	x_to_z_kill(benchmarks[s], params[s][:x0]), params[s][:d], H, az, el)
-  ╠═╡ =#
-
-# ╔═╡ 22dbd804-71af-4319-955c-4684364225bc
-#=╠═╡
-pd(:F1, 28)
-  ╠═╡ =#
-
 # ╔═╡ Cell order:
 # ╟─6e8ceb64-c5a7-4dee-8078-ce5aed37a169
 # ╠═ba91b96e-1c2a-11ee-35f8-2183fe15f018
@@ -239,5 +227,3 @@ pd(:F1, 28)
 # ╟─516e761e-d193-45a5-9931-850d99c6f5fa
 # ╟─9ef447f4-d849-4807-8546-411f55021821
 # ╟─4858b2e4-c2dd-4ab1-bfbb-862d16802bf5
-# ╠═d07fe9f5-c1da-48ef-a58d-d865be62eb33
-# ╠═22dbd804-71af-4319-955c-4684364225bc
