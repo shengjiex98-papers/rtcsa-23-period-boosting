@@ -14,33 +14,35 @@ export x_to_z_kill, x_to_z_skip_next
 export period_boosting
 export plotdev
 
-function plotdev(sysc::AbstractStateSpace{<:Continuous}, 
-        nom::AbstractMatrix{<:Real}, nomp::Integer, safety_margin::Real,
-        trj::Vector{Pair{String, <:AbstractMatrix{<:Real}}};
-        az::Real=50, el::Real=35, ar::Real=1)
+function plotdev(nom::AbstractMatrix{<:Real}, nomp::Integer, x0::Real,
+        d::Real, trj::Vector{<:Pair{String, <:AbstractMatrix{<:Real}}},
+        az::Real, el::Real, ar::Real, legend::Symbol, title::String)
     t = size(nom, 2)
-    @boundscheck all(isequal(t), map(x -> size(x[2], 2), trj)) || 
-        throw(ArgumentError("All trajectories must be the same length."))
+    @boundscheck all(x -> (x <= t), map(x -> size(x[2], 2), trj)) || 
+        throw(ArgumentError("All trajectories must be of the same or shorter length "
+        * "than the nominal trajectory."))
+    
+    limits = (-x0 - d*2, x0*1.2 + d*2)
 
     # Create empty plot with three dimensions
-	plt = plot(xlabel=L"x_1", ylabel=L"x_2", zlabel=L"t",
-               camera=(az,el), aspect_ratio=ar)
+	plt = plot(xlabel=L"x_1", ylabel=L"x_2", zlabel=L"t", legend=legend,
+    title=title, camera=(az,el), aspect_ratio=ar, xlimits=limits, ylimits=limits)
 
     # Plot nominal trajectory
-    plot!(nominal[1,:], nominal[2,:], (1:t)/1000, label="Nominal", color=:black)
+    plot!(nom[1,:], nom[2,:], (1:t)/nomp, label="Nominal", color=:black)
 
     # Plot safety pipe
 	θ = LinRange(0, 2π, 20)
-	circ_x = cos.(θ) * safety_margin
-	circ_y = sin.(θ) * safety_margin
-	for i in 1:nomp:safety_margin
-		plot!(circ_x .+ nominal[1,i], circ_y .+ nominal[2,i], 
-        repeat([i], size(θ,1)), label=(i == 1) ? "Safety Margin" : "", 
+	circ_x = cos.(θ) * d
+	circ_y = sin.(θ) * d
+	for i in 1:nomp:t
+		plot!(circ_x .+ nom[1,i], circ_y .+ nom[2,i], 
+        repeat([i/nomp], size(θ,1)), label=(i == 1) ? "Safety Margin" : "", 
         seriestype=[:shape,], color=:lightblue)
 	end
 
     for (label, γ) in trj
-        plot(γ[1,:], γ[2,:], (1:t)/1000, label=label)
+        plot!(γ[1,:], γ[2,:], (1:size(γ,2))/nomp, label=label)
     end
 
     plt
@@ -96,12 +98,64 @@ function trajectory_coarse(sysc::AbstractStateSpace{<:Continuous},
     evol(a, z0, input)'[1:sysc.nx,:]
 end
 
-function x_to_z_kill(sys::AbstractStateSpace, x0::Real, u0::Real=0)
-    vcat(repeat([Float64(x0)], sys.nx), repeat([Float64(u0)], sys.nu))
+"""
+    x_to_z(sys, x0; skipnext=false)
+    x_to_z(sys, x0, u0; skipnext=false)
+
+Convert a given initial state `x0` (and optionally the initial input `u0`) to the 
+initial state `z0` for the transducer automaton defined in `ControlTimingSafety`.
+The `skipnext` flag determines if the state `z0` is in format for the `SkipNext` or
+the `Kill` automaton.
+"""
+function x_to_z(sys::AbstractStateSpace, x0::Real, u0::Real=0; skipnext=false)
 end
 
-function x_to_z_skip_next(sys::AbstractStateSpace, x0::Real, u0::Real=0)
-    vcat(repeat([Float64(x0)], sys.nx), repeat([0.0], sys.nx), repeat([Float64(u0)], sys.nu))
+"""
+    x_to_z_kill(sys, x0)
+    x_to_z_kill(sys, x0, u0)
+
+Convert a given initial state `x0` (with optional initial input `u0`) to
+the required initial state `z0` for the `Kill` type Automaton.
+"""
+x_to_z_kill(sys::AbstractStateSpace, x0::Real, u0::Real=0) =
+    @inbounds x_to_z_kill(sys, fill(x0, sys.nx), fill(u0, sys.nu))
+
+x_to_z_kill(sys::AbstractStateSpace, x0::Vector{<:Real}, u0::Real=0) =
+    x_to_z_kill(sys, x0, fill(u0, sys.nu))
+
+x_to_z_kill(sys::AbstractStateSpace, x0::Real, u0::Vector{<:Real}=fill(0.0, sys.nu)) =
+    x_to_z_kill(sys, fill(x0, sys.nx), u0)
+
+function x_to_z_kill(sys::AbstractStateSpace, x0::Vector{<:Real}, u0::Vector{<:Real})
+    @boundscheck length(x0) == sys.nx || 
+        throw(ArgumentError("Dimension missmatch between `x0`` and `sys.nx`"))
+    @boundscheck length(u0) == sys.nu || 
+        throw(ArgumentError("Dimension missmatch between `u0`` and `sys.nu`"))
+    Float64.(vcat(x0, u0))
+end
+
+"""
+    x_to_z_skip_next(sys, x0)
+    x_to_z_skip_next(sys, x0, u0)
+
+Convert a given initial state `x0` (with optional initial input `u0`) to
+the required initial state `z0` for the `SkipNext` type Automaton.
+"""
+x_to_z_skip_next(sys::AbstractStateSpace, x0::Real, u0::Real=0) =
+    @inbounds x_to_z_skip_next(sys, fill(x0, sys.nx), fill(u0, sys.nu))
+
+x_to_z_skip_next(sys::AbstractStateSpace, x0::Vector{<:Real}, u0::Real=0) =
+    x_to_z_skip_next(sys, x0, fill(u0, sys.nu))
+
+x_to_z_skip_next(sys::AbstractStateSpace, x0::Real, u0::Vector{<:Real}=fill(0.0, sys.nu)) =
+    x_to_z_skip_next(sys, fill(x0, sys.nx), u0)
+
+function x_to_z_skip_next(sys::AbstractStateSpace, x0::Vector{<:Real}, u0::Vector{<:Real})
+    @boundscheck length(x0) == sys.nx || 
+        throw(ArgumentError("Dimension missmatch between `x0`` and `sys.nx`"))
+    @boundscheck length(u0) == sys.nu || 
+        throw(ArgumentError("Dimension missmatch between `u0`` and `sys.nu`"))
+    Float64.(vcat(x0, fill(0.0, sys.nx), u0))
 end
 
 function slice_nominal(nom::AbstractMatrix{<:Real}, p::Integer)

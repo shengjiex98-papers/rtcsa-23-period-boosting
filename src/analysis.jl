@@ -147,8 +147,8 @@ s28 = let
 	consr = map(systems) do sys
 		saf[Symbol(sys, 28, "-RE")]
 	end
-	schedule_xghtc(consn, 100, slotsize=2, fullpath=true),
-	schedule_xghtc(consr, 100, slotsize=2, fullpath=true)
+	schedule_xghtc(consn, 100, slotsize=2, fullpath=false),
+	schedule_xghtc(consr, 100, slotsize=2, fullpath=false)
 end
 
 # ╔═╡ 37da5df9-103b-413d-9de0-9693f1eb7263
@@ -168,26 +168,6 @@ end
 md"""
 ## Deviation Visualization
 """
-
-# ╔═╡ 9ef447f4-d849-4807-8546-411f55021821
-begin
-	H = 100
-	d_max = 1000
-	maxwindow = 6
-	params = (
-	    RC = (p = 23, d = 5.8, x0 = 100, n = 10),
-	    F1 = (p = 20, d = 0.37, x0 = 1,   n = 15),
-	    DC = (p = 23, d = 0.18, x0 = 100, n = 10),
-	    CS = (p = 27, d = 2.0, x0 = 100, n = 15),
-	    CC = (p = 28, d = 4.5, x0 = 10,  n = 15))
-	K = (
-	    RC = delay_lqr(benchmarks[:RC], 0.001*params[:RC][:p]),
-	    F1 = delay_lqr(benchmarks[:F1], 0.001*params[:F1][:p]),
-	    DC = delay_lqr(benchmarks[:DC], 0.001*params[:DC][:p]),
-	    CS = delay_lqr(benchmarks[:CS], 0.001*params[:CS][:p]),
-	    CC = delay_lqr(benchmarks[:CC], 0.001*params[:CC][:p]))
-	K[:RC]
-end
 
 # ╔═╡ 4858b2e4-c2dd-4ab1-bfbb-862d16802bf5
 md"""
@@ -225,5 +205,4 @@ md"""
 # ╠═9c76bed6-0e5a-4219-8881-b22d418b05a2
 # ╠═37da5df9-103b-413d-9de0-9693f1eb7263
 # ╟─516e761e-d193-45a5-9931-850d99c6f5fa
-# ╟─9ef447f4-d849-4807-8546-411f55021821
-# ╟─4858b2e4-c2dd-4ab1-bfbb-862d16802bf5
+# ╠═4858b2e4-c2dd-4ab1-bfbb-862d16802bf5
