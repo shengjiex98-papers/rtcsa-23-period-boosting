@@ -1,4 +1,5 @@
 [deps]
+ControlBenchmarks = "fae2e0ce-fbc2-4985-89d7-921c1ae7f515"
 ControlSafetyBench = "b878d8fe-c8de-4236-8931-715afe6be538"
 ControlSystemsBase = "aaaaaaaa-a6ca-5380-bf3e-84a91bcd477e"
 ControlTimingSafety = "3a76c758-31f1-42cb-b697-12fe755e3b12"

@@ -25,7 +25,7 @@ function plotdev(nom::AbstractMatrix{<:Real}, nomp::Integer, x0::Real,
     limits = (-x0 - d*2, x0*1.2 + d*2)
 
     # Create empty plot with three dimensions
-	plt = plot(xlabel=L"x_1", ylabel=L"x_2", zlabel=L"t", legend=legend,
+	plt = plot(xlabel=L"x position (meters)", ylabel=L"y position (meters)", zlabel=L"time (seconds)", legend=legend,
     title=title, camera=(az,el), aspect_ratio=ar, xlimits=limits, ylimits=limits)
 
     # Plot nominal trajectory
